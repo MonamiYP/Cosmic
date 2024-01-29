@@ -6,6 +6,7 @@
 #include "VertexBuffer.hpp"
 #include "VertexBufferLayout.hpp"
 #include "VertexArray.hpp"
+#include "IndexBuffer.hpp"
 #include "Shader.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -38,9 +39,14 @@ int main() {
     }
 
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
+        0.5f,  0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left 
+    };
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
     };
 
     VertexArray VAO;
@@ -48,6 +54,8 @@ int main() {
     VertexBufferLayout layout;
     layout.AddAttribute(3);
     VAO.AddBuffer(VBO, layout);
+    
+    IndexBuffer IBO(indices, 6);
 
     Shader shader;
     std::string vertex_source = shader.ParseShader("../res/shaders/vertex_shader.vs");
@@ -64,7 +72,7 @@ int main() {
 
         shader.Bind();
         VAO.Bind();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();    
