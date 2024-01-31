@@ -5,6 +5,7 @@
 #include <cassert>
 
 #include "VertexArray.hpp"
+#include "IndexBuffer.hpp"
 #include "Shader.hpp"
 
 // #define ASSERT(x) if (!(x)) __debugbreak();
@@ -18,5 +19,6 @@ bool GLLogCall(const char* function, const char* file, int line);
 class Renderer {
     private:
     public:
-    void Clear() const;
+        void Draw(const VertexArray& VAO, const IndexBuffer& IBO, const Shader& shader) const;
+        void Clear() const;
 };

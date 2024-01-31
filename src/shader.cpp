@@ -16,6 +16,15 @@ void Shader::CreateShaderProgram(const std::string& vertexShader, const std::str
     glAttachShader(shaderProgram, vertex_shader);
     glAttachShader(shaderProgram, fragment_shader);
     glLinkProgram(shaderProgram);
+
+    // Error handling
+    int success;
+    char infoLog[512];
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
     glValidateProgram(shaderProgram);
 
     glDeleteShader(vertex_shader);
@@ -60,4 +69,24 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
     }
 
     return id;
+}
+
+int Shader::GetUniformLocation(const std::string& name) {
+    if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end())
+        return m_uniformLocationCache[name];
+
+    int location = glGetUniformLocation(m_shaderProgramID, name.c_str());
+    if (location == -1)
+        std::cout << "Warning: uniform " << name << " doesn't exist" << std::endl;
+    
+    m_uniformLocationCache[name] = location;
+    return location;
+}
+
+void Shader::SetInt(const std::string& name, int value) {
+    glUniform1i(GetUniformLocation(name), value);
+}
+
+void Shader::SetMatrix4(const std::string& name, const glm::mat4& matrix) {
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
 }

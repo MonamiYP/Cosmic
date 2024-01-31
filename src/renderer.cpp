@@ -13,7 +13,13 @@ bool GLLogCall(const char* function, const char* file, int line) {
     return true;
 }
 
+void Renderer::Draw(const VertexArray& VAO, const IndexBuffer& IBO, const Shader& shader) const {
+    shader.Bind();
+    VAO.Bind();
+    glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, 0);
+}
+
 void Renderer::Clear() const {
-    GLCall(glClearColor(0.1f, 0.1f, 0.1f, 1.0f));
+    GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f););
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
