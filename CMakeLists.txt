@@ -6,10 +6,12 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
+file(GLOB_RECURSE IMGUI include/imgui/*.cpp)
 
 add_executable(${PROJECT_NAME} 
     src/main.cpp
     src/glad.c
+    ${IMGUI}
     ${SOURCE_FILES}
 )
 

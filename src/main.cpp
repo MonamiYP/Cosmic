@@ -7,6 +7,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
 #include "VertexBuffer.hpp"
 #include "VertexBufferLayout.hpp"
 #include "VertexArray.hpp"
@@ -20,6 +24,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void scroll_callback(GLFWwindow* window, double xScroll, double yScroll);
+void window_focus_callback(GLFWwindow* window, int focused);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 8.0f));
 
@@ -55,6 +60,7 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
+    glfwSetWindowFocusCallback(window, window_focus_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -62,6 +68,13 @@ int main() {
     }
 
     glEnable(GL_DEPTH_TEST);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
     
     float vertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -153,10 +166,24 @@ int main() {
         // renderer.Draw(VAO, IBO, shader);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("A window");
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::End();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
         glfwPollEvents();    
     }
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwTerminate();
     return 0;
 }
@@ -190,6 +217,12 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
     lastY = yPos;
 
     camera.ProcessMouseInput(xOffset, yOffset);
+}
+
+void window_focus_callback(GLFWwindow* window, int focused) {
+    if (focused) {
+        glfwSetCursorPos(window, lastX, lastY);
+    }
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
