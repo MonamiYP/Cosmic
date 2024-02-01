@@ -11,6 +11,10 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "VertexBuffer.hpp"
 #include "VertexBufferLayout.hpp"
 #include "VertexArray.hpp"
@@ -19,6 +23,7 @@
 #include "Renderer.hpp"
 #include "Texture.hpp"
 #include "Camera.hpp"
+#include "Model.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -125,12 +130,12 @@ int main() {
         1, 2, 3    // second triangle
     };
 
-    VertexArray VAO;
-    VertexBuffer VBO(vertices, sizeof(vertices));
-    VertexBufferLayout layout;
-    layout.AddAttribute(3);
-    layout.AddAttribute(2);
-    VAO.AddBuffer(VBO, layout);
+    // VertexArray VAO;
+    // VertexBuffer VBO(vertices, sizeof(vertices));
+    // VertexBufferLayout layout;
+    // layout.AddAttribute(3);
+    // layout.AddAttribute(2);
+    // VAO.AddBuffer(VBO, layout);
     
     // IndexBuffer IBO(indices, 6);
 
@@ -143,10 +148,9 @@ int main() {
     texture.Bind();
 
     shader.Bind();
-    shader.SetInt("u_texture", 0);
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));  
-    shader.SetMatrix4("u_model", model);
+    // shader.SetInt("u_texture", 0);
+
+    Model backpack_model("../res/assets/backpack/backpack.obj");
 
     Renderer renderer;
 
@@ -164,7 +168,14 @@ int main() {
         shader.SetMatrix4("u_projection", projection);
 
         // renderer.Draw(VAO, IBO, shader);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        shader.SetMatrix4("u_model", model);
+
+        backpack_model.Draw(shader);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

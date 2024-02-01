@@ -16,12 +16,15 @@ add_executable(${PROJECT_NAME}
 )
 
 add_subdirectory(include/glfw)
+add_subdirectory(include/assimp)
 
 target_include_directories(${PROJECT_NAME} 
     PUBLIC include/glfw/include
+    PUBLIC include/assimp/include
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_link_libraries(${PROJECT_NAME} 
     glfw
+    assimp
 )
