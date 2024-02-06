@@ -87,6 +87,10 @@ void Shader::SetInt(const std::string& name, int value) {
     glUniform1i(GetUniformLocation(name), value);
 }
 
+void Shader::SetVector3(const std::string& name, const glm::vec3& vector) {
+    glUniform3fv(GetUniformLocation(name), 1, &vector[0]);
+}
+
 void Shader::SetMatrix4(const std::string& name, const glm::mat4& matrix) {
     glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
 }

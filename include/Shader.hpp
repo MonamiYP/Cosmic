@@ -22,6 +22,8 @@ class Shader {
         void CreateShaderProgram(const std::string& vertexShader, const std::string& fragmentShader);
 
         int GetUniformLocation(const std::string& name);
+
         void SetInt(const std::string& name, int value);
+        void SetVector3(const std::string& name, const glm::vec3& vector);
         void SetMatrix4(const std::string& name, const glm::mat4& matrix);
 };

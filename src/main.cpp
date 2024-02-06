@@ -82,75 +82,79 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 330");
     
     float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f, -0.5f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
+    -0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f
+};
 
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
-    };
+    // unsigned int indices[] = {  
+    //     0, 1, 3,   // first triangle
+    //     1, 2, 3    // second triangle
+    // };
 
-    // VertexArray VAO;
-    // VertexBuffer VBO(vertices, sizeof(vertices));
-    // VertexBufferLayout layout;
-    // layout.AddAttribute(3);
-    // layout.AddAttribute(2);
-    // VAO.AddBuffer(VBO, layout);
-    
-    // IndexBuffer IBO(indices, 6);
+    VertexBuffer VBO(vertices, sizeof(vertices));
+    VertexBufferLayout layout;
+    layout.AddAttribute(3);
+    VertexArray lightVAO;
+    lightVAO.AddBuffer(VBO, layout);
 
     Shader shader;
     std::string vertex_source = shader.ParseShader("../res/shaders/vertex_shader.vs");
     std::string fragment_source = shader.ParseShader("../res/shaders/fragment_shader.fs");
     shader.CreateShaderProgram(vertex_source, fragment_source);
 
+    Shader lightShader;
+    std::string light_fragment_source = shader.ParseShader("../res/shaders/light_shader.fs");
+    lightShader.CreateShaderProgram(vertex_source, light_fragment_source);
+
+    lightShader.Bind();
+    lightShader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
+    shader.Bind();
+    shader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
+    shader.SetVector3("lightPos", glm::vec3(1.0f, 0.0f, 0.0f));
+
     Texture texture("../res/assets/container.jpg");
     texture.Bind();
 
-    shader.Bind();
-    // shader.SetInt("u_texture", 0);
-
-    Model backpack_model("../res/assets/backpack/backpack.obj");
+    Model spaceship_model("../res/assets/spaceship/space_ship3.obj");
 
     Renderer renderer;
 
@@ -162,20 +166,29 @@ int main() {
         processInput(window);
         renderer.Clear();
 
+        // Light
+        lightVAO.Bind();
+        lightShader.Bind();
         glm::mat4 view = camera.GetCameraView();
         glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 0.1f, 100.0f);
-        shader.SetMatrix4("u_view", view);
-        shader.SetMatrix4("u_projection", projection);
-
-        // renderer.Draw(VAO, IBO, shader);
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
+        lightShader.SetMatrix4("u_view", view);
+        lightShader.SetMatrix4("u_projection", projection);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.2f)); 
+        lightShader.SetMatrix4("u_model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // Spaceship
+        shader.Bind();
+        shader.SetMatrix4("u_view", view);
+        shader.SetMatrix4("u_projection", projection);
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
         shader.SetMatrix4("u_model", model);
-
-        backpack_model.Draw(shader);
+        shader.SetVector3("viewPos", camera.GetPosition()); 
+        spaceship_model.Draw(shader);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
