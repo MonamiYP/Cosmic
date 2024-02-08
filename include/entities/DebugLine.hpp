@@ -18,9 +18,10 @@ class DebugLine {
         
         std::vector<float> GetVertices();
         void SetLineVertices(const glm::vec3& start, const glm::vec3& end);
-        void Render(glm::mat4& view, glm::mat4& projection, const VertexArray& va);
+        void SetPosition(const glm::vec3& position);
+        void Render(const VertexArray& va);
+        glm::mat4 GetModelMatrix();
     private:
-        void SetupShader();
         std::vector<float> m_vertices;
-        Shader shader;
+        glm::vec3 m_position;
 };

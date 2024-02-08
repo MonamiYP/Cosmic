@@ -131,7 +131,7 @@ int main() {
     VertexArray lightVAO;
     lightVAO.AddBuffer(VBO, layout);
 
-    DebugLine line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(10.0f, 10.0f, 10.0f));
+    DebugLine line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     std::vector<float> line_vertex = line.GetVertices();
     VertexBuffer lineVBO(&line_vertex[0], sizeof(line_vertex));
     VertexArray lineVAO;
@@ -145,6 +145,11 @@ int main() {
     Shader lightShader;
     std::string light_fragment_source = shader.ParseShader("../res/shaders/light_shader.fs");
     lightShader.CreateShaderProgram(vertex_source, light_fragment_source);
+
+    Shader lineShader;
+    vertex_source = lineShader.ParseShader("../res/shaders/debug_line.vs");
+    fragment_source = lineShader.ParseShader("../res/shaders/debug_line.fs");
+    lineShader.CreateShaderProgram(vertex_source, fragment_source);
 
     lightShader.Bind();
     lightShader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
@@ -180,7 +185,12 @@ int main() {
 
         // Line
         line.SetLineVertices(player.GetPosition(), player.GetForwardDir());
-        line.Render(view, projection, lineVAO);
+        lineShader.Bind();
+        lineShader.SetMatrix4("u_view", view);
+        lineShader.SetMatrix4("u_projection", projection);
+        line.SetPosition(player.GetPosition());
+        lineShader.SetMatrix4("u_model", line.GetModelMatrix());
+        line.Render(lineVAO);
     
         // Spaceship
         shader.Bind();
