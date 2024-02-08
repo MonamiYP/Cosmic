@@ -24,14 +24,15 @@
 #include "Texture.hpp"
 #include "Camera.hpp"
 #include "Player.hpp"
+#include "DebugLine.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
-void scroll_callback(GLFWwindow* window, double xScroll, double yScroll);
 void window_focus_callback(GLFWwindow* window, int focused);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 8.0f));
+Player player(glm::vec3(0.0f, -4.0f, -5.0f));
 
 const float WINDOW_WIDTH = 1200.0f;
 const float WINDOW_HEIGHT = 800.0f;
@@ -63,7 +64,6 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
     glfwSetWindowFocusCallback(window, window_focus_callback);
 
@@ -131,6 +131,12 @@ int main() {
     VertexArray lightVAO;
     lightVAO.AddBuffer(VBO, layout);
 
+    DebugLine line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(10.0f, 10.0f, 10.0f));
+    std::vector<float> line_vertex = line.GetVertices();
+    VertexBuffer lineVBO(&line_vertex[0], sizeof(line_vertex));
+    VertexArray lineVAO;
+    lineVAO.AddBuffer(lineVBO, layout);
+
     Shader shader;
     std::string vertex_source = shader.ParseShader("../res/shaders/vertex_shader.vs");
     std::string fragment_source = shader.ParseShader("../res/shaders/fragment_shader.fs");
@@ -146,10 +152,6 @@ int main() {
     shader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
     shader.SetVector3("lightPos", glm::vec3(1.0f, 0.0f, 0.0f));
 
-    Texture texture("../res/assets/container.jpg");
-    texture.Bind();
-
-    Player player;
     player.SetModelFromSource("../res/assets/spaceship/space_ship3.obj");
 
     Renderer renderer;
@@ -176,16 +178,19 @@ int main() {
         lightShader.SetMatrix4("u_model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // Line
+        line.SetLineVertices(player.GetPosition(), player.GetForwardDir());
+        line.Render(view, projection, lineVAO);
+    
         // Spaceship
         shader.Bind();
         shader.SetMatrix4("u_view", view);
         shader.SetMatrix4("u_projection", projection);
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-        shader.SetMatrix4("u_model", model);
+        shader.SetMatrix4("u_model", player.GetModelMatrix());
         shader.SetVector3("viewPos", camera.GetPosition()); 
         player.Render(shader);
 
+        // ImGUI
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -213,21 +218,17 @@ void processInput(GLFWwindow *window) {
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(FORWARDS, deltaTime);
+        player.ProcessKeyboardInput(FORWARDS, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(BACKWARDS, deltaTime);
+        player.ProcessKeyboardInput(BACKWARDS, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(LEFT, deltaTime);
+        player.ProcessKeyboardInput(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(RIGHT, deltaTime);
+        player.ProcessKeyboardInput(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(UP, deltaTime);
+        player.ProcessKeyboardInput(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(DOWN, deltaTime);
-}
-
-void scroll_callback(GLFWwindow* window, double xScroll, double yScroll) {
-    camera.ProcessScrollInput(yScroll);
+        player.ProcessKeyboardInput(DOWN, deltaTime);
 }
 
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
@@ -236,7 +237,7 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
     lastX = xPos;
     lastY = yPos;
 
-    camera.ProcessMouseInput(xOffset, yOffset);
+    player.ProcessMouseInput(xOffset, yOffset);
 }
 
 void window_focus_callback(GLFWwindow* window, int focused) {

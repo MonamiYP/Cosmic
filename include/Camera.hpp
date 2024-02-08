@@ -4,10 +4,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-enum CameraMovementDir {
-    UP, DOWN, LEFT, RIGHT, FORWARDS, BACKWARDS
-};
-
 class Camera {
     private:
         glm::vec3 m_position;
@@ -29,7 +25,6 @@ class Camera {
         ~Camera() {}
 
         glm::mat4 GetCameraView();
-        void ProcessKeyboardInput(CameraMovementDir dir, float deltaTime);
         void ProcessMouseInput(float xOffset, float yOffset);
         void ProcessScrollInput(float yScroll);
         void UpdateVectors();
