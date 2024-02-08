@@ -23,7 +23,7 @@
 #include "Renderer.hpp"
 #include "Texture.hpp"
 #include "Camera.hpp"
-#include "Model.hpp"
+#include "Player.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -125,11 +125,6 @@ int main() {
     -0.5f,  0.5f, -0.5f
 };
 
-    // unsigned int indices[] = {  
-    //     0, 1, 3,   // first triangle
-    //     1, 2, 3    // second triangle
-    // };
-
     VertexBuffer VBO(vertices, sizeof(vertices));
     VertexBufferLayout layout;
     layout.AddAttribute(3);
@@ -154,7 +149,8 @@ int main() {
     Texture texture("../res/assets/container.jpg");
     texture.Bind();
 
-    Model spaceship_model("../res/assets/spaceship/space_ship3.obj");
+    Player player;
+    player.SetModelFromSource("../res/assets/spaceship/space_ship3.obj");
 
     Renderer renderer;
 
@@ -188,7 +184,7 @@ int main() {
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
         shader.SetMatrix4("u_model", model);
         shader.SetVector3("viewPos", camera.GetPosition()); 
-        spaceship_model.Draw(shader);
+        player.Render(shader);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
