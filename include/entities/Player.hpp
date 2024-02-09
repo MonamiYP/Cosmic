@@ -13,7 +13,7 @@ enum MovementDir {
 
 class Player {
     public:
-        Player(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
+        Player(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
             float yaw = -90.0f, float pitch = 0.0f);
         ~Player() {}
 
@@ -22,24 +22,26 @@ class Player {
 
         void ProcessKeyboardInput(MovementDir dir, float deltaTime);
         void ProcessMouseInput(float xOffset, float yOffset);
-        void UpdateVectors();
-        glm::vec3 GetPosition();
-        glm::vec3 GetForwardDir();
+        void UpdateLocalVectors();
+
+        glm::vec3 GetPosition() { return m_position; }
+        glm::vec3 GetRotation() { return m_rotation; }
+        glm::vec3 GetForwardDir() { return m_forwards; }
+        glm::vec3 GetUpDir() { return m_up; }
+        glm::vec3 GetRightDir() { return m_right; }
         glm::mat4 GetModelMatrix();
     private:
-        float m_movementSpeed;
-        float m_rollSpeed;
-        float m_mouseSensitivity;
-
-        float m_yaw;
-        float m_pitch;
-        float m_roll;
+        float m_movementSpeed = 10.0f;
+        float m_rollSpeed = 100.0f;
+        float m_mouseSensitivity = 0.1f;
 
         glm::vec3 m_position;
+        glm::vec3 m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 m_scale;
+
         glm::vec3 m_forwards;
         glm::vec3 m_up;
         glm::vec3 m_right;
-        glm::vec3 m_worldUp;
 
         Model m_playerModel;
 };

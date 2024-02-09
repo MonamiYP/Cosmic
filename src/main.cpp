@@ -31,7 +31,7 @@ void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void window_focus_callback(GLFWwindow* window, int focused);
 
-Camera camera(glm::vec3(0.0f, 0.0f, 8.0f));
+Camera camera(glm::vec3(0.0f, 1.0f, 10.0f));
 Player player(glm::vec3(0.0f, -4.0f, -5.0f));
 
 const float WINDOW_WIDTH = 1200.0f;
@@ -131,11 +131,21 @@ int main() {
     VertexArray lightVAO;
     lightVAO.AddBuffer(VBO, layout);
 
-    DebugLine line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 10.0f, 0.0f));
-    std::vector<float> line_vertex = line.GetVertices();
-    VertexBuffer lineVBO(&line_vertex[0], sizeof(line_vertex));
-    VertexArray lineVAO;
-    lineVAO.AddBuffer(lineVBO, layout);
+    DebugLine x_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(10.0f, 0.0f, 0.0f));
+    DebugLine y_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 10.0f, 0.0f));
+    DebugLine z_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 10.0f));
+    std::vector<float> x_line_vertex = x_line.GetVertices();
+    std::vector<float> y_line_vertex = y_line.GetVertices();
+    std::vector<float> z_line_vertex = z_line.GetVertices();
+    VertexBuffer x_lineVBO(&x_line_vertex[0], sizeof(x_line_vertex));
+    VertexBuffer y_lineVBO(&y_line_vertex[0], sizeof(y_line_vertex));
+    VertexBuffer z_lineVBO(&z_line_vertex[0], sizeof(z_line_vertex));
+    VertexArray x_lineVAO;
+    VertexArray y_lineVAO;
+    VertexArray z_lineVAO;
+    x_lineVAO.AddBuffer(x_lineVBO, layout);
+    y_lineVAO.AddBuffer(y_lineVBO, layout);
+    z_lineVAO.AddBuffer(z_lineVBO, layout);
 
     Shader shader;
     std::string vertex_source = shader.ParseShader("../res/shaders/vertex_shader.vs");
@@ -184,13 +194,16 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // Line
-        line.SetLineVertices(player.GetPosition(), player.GetForwardDir());
         lineShader.Bind();
         lineShader.SetMatrix4("u_view", view);
         lineShader.SetMatrix4("u_projection", projection);
-        line.SetPosition(player.GetPosition());
-        lineShader.SetMatrix4("u_model", line.GetModelMatrix());
-        line.Render(lineVAO);
+        lineShader.SetMatrix4("u_model", x_line.GetModelMatrix());
+        lineShader.SetVector3("color",  glm::vec3(1.0f, 0.0f, 0.0f));
+        x_line.Render(x_lineVAO);
+        lineShader.SetVector3("color",  glm::vec3(1.0f, 1.0f, 0.0f));
+        y_line.Render(y_lineVAO);
+        lineShader.SetVector3("color",  glm::vec3(0.0f, 1.0f, 1.0f));
+        z_line.Render(z_lineVAO);
     
         // Spaceship
         shader.Bind();

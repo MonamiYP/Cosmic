@@ -21,17 +21,16 @@ void DebugLine::SetLineVertices(const glm::vec3& start, const glm::vec3& end) {
     m_vertices.push_back(end.z);
 }
 
-std::vector<float> DebugLine::GetVertices() {
-    return m_vertices;
-}
-
-void DebugLine::SetPosition(const glm::vec3& position) {
-    m_position = position;
+void DebugLine::SetLocalVectors(const glm::vec3& up, const glm::vec3& forwards, const glm::vec3& right) {
+    m_up = up;
+    m_forwards = forwards;
+    m_right = right;
 }
 
 glm::mat4 DebugLine::GetModelMatrix() {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, m_position);
+    model = glm::rotate(model, glm::radians(m_rotation.z), m_forwards);
 
     return model;
 }
