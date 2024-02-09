@@ -47,13 +47,9 @@ void Player::ProcessKeyboardInput(MovementDir dir, float deltaTime) {
 
 void Player::ProcessMouseInput(float xOffset, float yOffset) {
     m_rotation.y -= xOffset * m_mouseSensitivity;
-    if (m_rotation.y >= 360) {
-        m_rotation.y = 0;
-    } else if (m_rotation.y <= -360) {
-        m_rotation.y = 0;
-    }
-
     m_rotation.x += yOffset * m_mouseSensitivity;
+
+    UpdateLocalVectors();
 }
 
 glm::mat4 Player::GetModelMatrix() {

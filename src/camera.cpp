@@ -1,5 +1,8 @@
 #include "Camera.hpp"
 
+Camera::Camera(const Player& player) {
+}
+
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) :
 m_forwards(glm::vec3(0.0f, 0.0f, -1.0f)), m_movementSpeed(5.0f), m_mouseSensitivity(0.1f), m_fov(40.0f) {
     m_position = position;
@@ -12,23 +15,6 @@ m_forwards(glm::vec3(0.0f, 0.0f, -1.0f)), m_movementSpeed(5.0f), m_mouseSensitiv
 
 glm::mat4 Camera::GetCameraView() {
     return glm::lookAt(m_position, m_position + m_forwards, m_up);
-}
-
-void Camera::ProcessMouseInput(float xOffset, float yOffset) {
-    m_yaw += xOffset * m_mouseSensitivity;
-    m_pitch += yOffset * m_mouseSensitivity;
-
-    if (m_pitch > 89.0f) { m_pitch = 89.0f; }
-    if (m_pitch < -89.0f) { m_pitch = -89.0f; }
-
-    UpdateVectors();
-}
-
-void Camera::ProcessScrollInput(float yScroll) {
-    m_fov -= yScroll;
-
-    if (m_fov > 60.0f) { m_fov = 60.0f; }
-    else if (m_fov < 5.0f) { m_fov = 5.0f; }
 }
 
 void Camera::UpdateVectors() {

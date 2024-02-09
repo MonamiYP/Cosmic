@@ -4,6 +4,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Player.hpp"
+
 class Camera {
     private:
         glm::vec3 m_position;
@@ -19,14 +21,13 @@ class Camera {
         float m_mouseSensitivity;
         float m_fov;
     public:
+        Camera(const Player& player);
         Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
                 float yaw = -90.0f, float pitch = -10.0f);
         ~Camera() {}
 
         glm::mat4 GetCameraView();
-        void ProcessMouseInput(float xOffset, float yOffset);
-        void ProcessScrollInput(float yScroll);
         void UpdateVectors();
 
         float GetFOV();

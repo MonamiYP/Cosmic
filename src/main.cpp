@@ -30,9 +30,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void window_focus_callback(GLFWwindow* window, int focused);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-Camera camera(glm::vec3(0.0f, 1.0f, 10.0f));
 Player player(glm::vec3(0.0f, -4.0f, -5.0f));
+Camera camera(glm::vec3(0.0f, 1.0f, 10.0f));
 
 const float WINDOW_WIDTH = 1200.0f;
 const float WINDOW_HEIGHT = 800.0f;
@@ -42,6 +43,8 @@ float lastY =  WINDOW_HEIGHT / 2.0;
 
 float deltaTime;
 float lastTime;
+
+bool guiActive = false;
 
 int main() {
     if (!glfwInit())
@@ -65,6 +68,7 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
+    glfwSetKeyCallback(window, key_callback);
     glfwSetWindowFocusCallback(window, window_focus_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -220,13 +224,18 @@ int main() {
 
         ImGui::Begin("A window");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::Text("Forward direction: x:%.3f y:%.3f z:%.3f", player.GetForwardDir().x, player.GetForwardDir().y, player.GetForwardDir().z);
+        ImGui::Text("Right direction: x:%.3f y:%.3f z:%.3f", player.GetRightDir().x, player.GetRightDir().y, player.GetRightDir().z);
+        ImGui::Text("Up direction: x:%.3f y:%.3f z:%.3f", player.GetUpDir().x, player.GetUpDir().y, player.GetUpDir().z);
+        ImGui::Text("Rotation: x:%.3f y:%.3f z:%.3f", player.GetRotation().x,  player.GetRotation().y,  player.GetRotation().z);
+        ImGui::Text("Hi");
         ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
-        glfwPollEvents();    
+        glfwPollEvents();
     }
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -237,7 +246,7 @@ int main() {
 }
 
 void processInput(GLFWwindow *window) {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -252,6 +261,18 @@ void processInput(GLFWwindow *window) {
         player.ProcessKeyboardInput(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         player.ProcessKeyboardInput(DOWN, deltaTime);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
+        if (!guiActive) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetCursorPosCallback(window, 0);
+        } else {
+            glfwSetCursorPosCallback(window, mouse_callback);
+        }
+        guiActive = !guiActive;
+    }
 }
 
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
