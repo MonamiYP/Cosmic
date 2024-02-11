@@ -23,15 +23,17 @@
 #include "Renderer.hpp"
 #include "Texture.hpp"
 #include "Camera.hpp"
-#include "Model.hpp"
+#include "Player.hpp"
+#include "DebugLine.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
-void scroll_callback(GLFWwindow* window, double xScroll, double yScroll);
 void window_focus_callback(GLFWwindow* window, int focused);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-Camera camera(glm::vec3(0.0f, 0.0f, 8.0f));
+Player player(glm::vec3(0.0f, -4.0f, -5.0f));
+Camera camera(&player);
 
 const float WINDOW_WIDTH = 1200.0f;
 const float WINDOW_HEIGHT = 800.0f;
@@ -41,6 +43,8 @@ float lastY =  WINDOW_HEIGHT / 2.0;
 
 float deltaTime;
 float lastTime;
+
+bool guiActive = false;
 
 int main() {
     if (!glfwInit())
@@ -63,8 +67,8 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
+    glfwSetKeyCallback(window, key_callback);
     glfwSetWindowFocusCallback(window, window_focus_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -125,16 +129,27 @@ int main() {
     -0.5f,  0.5f, -0.5f
 };
 
-    // unsigned int indices[] = {  
-    //     0, 1, 3,   // first triangle
-    //     1, 2, 3    // second triangle
-    // };
-
     VertexBuffer VBO(vertices, sizeof(vertices));
     VertexBufferLayout layout;
     layout.AddAttribute(3);
     VertexArray lightVAO;
     lightVAO.AddBuffer(VBO, layout);
+
+    DebugLine x_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(10.0f, 0.0f, 0.0f));
+    DebugLine y_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 10.0f, 0.0f));
+    DebugLine z_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 10.0f));
+    std::vector<float> x_line_vertex = x_line.GetVertices();
+    std::vector<float> y_line_vertex = y_line.GetVertices();
+    std::vector<float> z_line_vertex = z_line.GetVertices();
+    VertexBuffer x_lineVBO(&x_line_vertex[0], sizeof(x_line_vertex));
+    VertexBuffer y_lineVBO(&y_line_vertex[0], sizeof(y_line_vertex));
+    VertexBuffer z_lineVBO(&z_line_vertex[0], sizeof(z_line_vertex));
+    VertexArray x_lineVAO;
+    VertexArray y_lineVAO;
+    VertexArray z_lineVAO;
+    x_lineVAO.AddBuffer(x_lineVBO, layout);
+    y_lineVAO.AddBuffer(y_lineVBO, layout);
+    z_lineVAO.AddBuffer(z_lineVBO, layout);
 
     Shader shader;
     std::string vertex_source = shader.ParseShader("../res/shaders/vertex_shader.vs");
@@ -145,16 +160,18 @@ int main() {
     std::string light_fragment_source = shader.ParseShader("../res/shaders/light_shader.fs");
     lightShader.CreateShaderProgram(vertex_source, light_fragment_source);
 
+    Shader lineShader;
+    vertex_source = lineShader.ParseShader("../res/shaders/debug_line.vs");
+    fragment_source = lineShader.ParseShader("../res/shaders/debug_line.fs");
+    lineShader.CreateShaderProgram(vertex_source, fragment_source);
+
     lightShader.Bind();
     lightShader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
     shader.Bind();
     shader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
     shader.SetVector3("lightPos", glm::vec3(1.0f, 0.0f, 0.0f));
 
-    Texture texture("../res/assets/container.jpg");
-    texture.Bind();
-
-    Model spaceship_model("../res/assets/spaceship/space_ship3.obj");
+    player.SetModelFromSource("../res/assets/spaceship/space_ship3.obj");
 
     Renderer renderer;
 
@@ -180,29 +197,44 @@ int main() {
         lightShader.SetMatrix4("u_model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // Line
+        lineShader.Bind();
+        lineShader.SetMatrix4("u_view", view);
+        lineShader.SetMatrix4("u_projection", projection);
+        lineShader.SetMatrix4("u_model", x_line.GetModelMatrix());
+        lineShader.SetVector3("color",  glm::vec3(1.0f, 0.0f, 0.0f));
+        x_line.Render(x_lineVAO);
+        lineShader.SetVector3("color",  glm::vec3(1.0f, 1.0f, 0.0f));
+        y_line.Render(y_lineVAO);
+        lineShader.SetVector3("color",  glm::vec3(0.0f, 1.0f, 1.0f));
+        z_line.Render(z_lineVAO);
+    
         // Spaceship
         shader.Bind();
         shader.SetMatrix4("u_view", view);
         shader.SetMatrix4("u_projection", projection);
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-        shader.SetMatrix4("u_model", model);
+        shader.SetMatrix4("u_model", player.GetModelMatrix());
+        camera.UpdateVectors();
         shader.SetVector3("viewPos", camera.GetPosition()); 
-        spaceship_model.Draw(shader);
+        player.Render(shader);
 
+        // ImGUI
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         ImGui::Begin("A window");
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::Text("Application average %.2f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::Text("Forward direction: x:%.2f y:%.2f z:%.2f", player.GetForwardDir().x, player.GetForwardDir().y, player.GetForwardDir().z);
+        ImGui::Text("Right direction: x:%.2f y:%.2f z:%.2f", player.GetRightDir().x, player.GetRightDir().y, player.GetRightDir().z);
+        ImGui::Text("Up direction: x:%.2f y:%.2f z:%.2f", player.GetUpDir().x, player.GetUpDir().y, player.GetUpDir().z);
         ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
-        glfwPollEvents();    
+        glfwPollEvents();
     }
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -213,25 +245,33 @@ int main() {
 }
 
 void processInput(GLFWwindow *window) {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(FORWARDS, deltaTime);
+        player.ProcessKeyboardInput(FORWARDS, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(BACKWARDS, deltaTime);
+        player.ProcessKeyboardInput(BACKWARDS, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(LEFT, deltaTime);
+        player.ProcessKeyboardInput(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(RIGHT, deltaTime);
+        player.ProcessKeyboardInput(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(UP, deltaTime);
+        player.ProcessKeyboardInput(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(DOWN, deltaTime);
+        player.ProcessKeyboardInput(DOWN, deltaTime);
 }
 
-void scroll_callback(GLFWwindow* window, double xScroll, double yScroll) {
-    camera.ProcessScrollInput(yScroll);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
+        if (!guiActive) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetCursorPosCallback(window, 0);
+        } else {
+            glfwSetCursorPosCallback(window, mouse_callback);
+        }
+        guiActive = !guiActive;
+    }
 }
 
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
@@ -240,7 +280,7 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
     lastX = xPos;
     lastY = yPos;
 
-    camera.ProcessMouseInput(xOffset, yOffset);
+    player.ProcessMouseInput(xOffset, yOffset);
 }
 
 void window_focus_callback(GLFWwindow* window, int focused) {
