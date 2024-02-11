@@ -24,7 +24,7 @@ class Player {
         void ProcessKeyboardInput(MovementDir dir, float deltaTime);
         void ProcessMouseInput(float xOffset, float yOffset);
 
-        glm::mat4 GetQuaternionRotation();
+        glm::mat4 GetQuaternionMatrix();
 
         glm::vec3 GetPosition() { return m_position; }
         glm::vec3 GetRotation() { return m_rotation; }
@@ -35,9 +35,9 @@ class Player {
     private:
         glm::mat4 m_prev_rot = glm::mat4(1.0f);
 
-        float m_movementSpeed = 10.0f;
-        float m_rollSpeed = 100.0f;
-        float m_mouseSensitivity = 0.1f;
+        float m_movementSpeed = 8.0f;
+        float m_rollSpeed = 80.0f;
+        float m_mouseSensitivity = 0.05f;
 
         glm::vec3 m_position;
         glm::vec3 m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);

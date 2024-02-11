@@ -33,7 +33,7 @@ void window_focus_callback(GLFWwindow* window, int focused);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 Player player(glm::vec3(0.0f, -4.0f, -5.0f));
-Camera camera(glm::vec3(0.0f, 1.0f, 10.0f));
+Camera camera(&player);
 
 const float WINDOW_WIDTH = 1200.0f;
 const float WINDOW_HEIGHT = 800.0f;
@@ -214,6 +214,7 @@ int main() {
         shader.SetMatrix4("u_view", view);
         shader.SetMatrix4("u_projection", projection);
         shader.SetMatrix4("u_model", player.GetModelMatrix());
+        camera.UpdateVectors();
         shader.SetVector3("viewPos", camera.GetPosition()); 
         player.Render(shader);
 
@@ -227,8 +228,6 @@ int main() {
         ImGui::Text("Forward direction: x:%.2f y:%.2f z:%.2f", player.GetForwardDir().x, player.GetForwardDir().y, player.GetForwardDir().z);
         ImGui::Text("Right direction: x:%.2f y:%.2f z:%.2f", player.GetRightDir().x, player.GetRightDir().y, player.GetRightDir().z);
         ImGui::Text("Up direction: x:%.2f y:%.2f z:%.2f", player.GetUpDir().x, player.GetUpDir().y, player.GetUpDir().z);
-        ImGui::Text("Rotation: x:%.2f y:%.2f z:%.2f", player.GetRotation().x,  player.GetRotation().y,  player.GetRotation().z);
-        ImGui::Text("Hi");
         ImGui::End();
 
         ImGui::Render();

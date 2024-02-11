@@ -8,7 +8,7 @@
 
 class Camera {
     private:
-        // Player& m_player;
+        Player* m_player;
         glm::vec3 m_position;
         glm::vec3 m_forwards;
         glm::vec3 m_up;
@@ -18,11 +18,10 @@ class Camera {
         float m_yaw;
         float m_pitch;
 
-        float m_movementSpeed;
-        float m_mouseSensitivity;
         float m_fov;
+        float m_distanceFromPlayer;
     public:
-        // Camera(const Player& player);
+        Camera(Player* player);
         Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
                 float yaw = -90.0f, float pitch = -10.0f);
@@ -34,4 +33,5 @@ class Camera {
         float GetFOV();
         glm::vec3 GetPosition();
         glm::vec3 GetForwards();
+        glm::vec3 GetUpDir() { return m_up; }
 };

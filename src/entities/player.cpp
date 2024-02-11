@@ -15,7 +15,7 @@ void Player::Render(Shader& shader) {
     m_playerModel.Draw(shader);
 }
 
-glm::mat4 Player::GetQuaternionRotation() {
+glm::mat4 Player::GetQuaternionMatrix() {
     glm::quat q_forwards = glm::angleAxis(glm::radians(m_rotation.z), m_forwards);
     glm::quat q_right = glm::angleAxis(glm::radians(m_rotation.x), m_right);
     glm::quat q_up = glm::angleAxis(glm::radians(m_rotation.y), m_up);
@@ -60,7 +60,7 @@ void Player::ProcessMouseInput(float xOffset, float yOffset) {
 }
 
 glm::mat4 Player::GetModelMatrix() {;
-    glm::mat4 m_quatRotationMatrix = GetQuaternionRotation();
+    glm::mat4 m_quatRotationMatrix = GetQuaternionMatrix();
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, m_position);
     model = model * m_quatRotationMatrix * m_prev_rot;
