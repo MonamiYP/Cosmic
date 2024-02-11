@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "Model.hpp"
 #include "Shader.hpp"
@@ -22,7 +23,8 @@ class Player {
 
         void ProcessKeyboardInput(MovementDir dir, float deltaTime);
         void ProcessMouseInput(float xOffset, float yOffset);
-        void UpdateLocalVectors();
+
+        glm::mat4 GetQuaternionRotation();
 
         glm::vec3 GetPosition() { return m_position; }
         glm::vec3 GetRotation() { return m_rotation; }
@@ -31,6 +33,8 @@ class Player {
         glm::vec3 GetRightDir() { return m_right; }
         glm::mat4 GetModelMatrix();
     private:
+        glm::mat4 m_prev_rot = glm::mat4(1.0f);
+
         float m_movementSpeed = 10.0f;
         float m_rollSpeed = 100.0f;
         float m_mouseSensitivity = 0.1f;

@@ -8,6 +8,7 @@
 
 class Camera {
     private:
+        // Player& m_player;
         glm::vec3 m_position;
         glm::vec3 m_forwards;
         glm::vec3 m_up;
@@ -21,7 +22,7 @@ class Camera {
         float m_mouseSensitivity;
         float m_fov;
     public:
-        Camera(const Player& player);
+        // Camera(const Player& player);
         Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
                 float yaw = -90.0f, float pitch = -10.0f);

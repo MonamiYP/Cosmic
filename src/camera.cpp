@@ -1,7 +1,8 @@
 #include "Camera.hpp"
 
-Camera::Camera(const Player& player) {
-}
+// Camera::Camera(const Player& player) {
+//     m_player = player;
+// }
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) :
 m_forwards(glm::vec3(0.0f, 0.0f, -1.0f)), m_movementSpeed(5.0f), m_mouseSensitivity(0.1f), m_fov(40.0f) {

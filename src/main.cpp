@@ -223,11 +223,11 @@ int main() {
         ImGui::NewFrame();
 
         ImGui::Begin("A window");
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::Text("Forward direction: x:%.3f y:%.3f z:%.3f", player.GetForwardDir().x, player.GetForwardDir().y, player.GetForwardDir().z);
-        ImGui::Text("Right direction: x:%.3f y:%.3f z:%.3f", player.GetRightDir().x, player.GetRightDir().y, player.GetRightDir().z);
-        ImGui::Text("Up direction: x:%.3f y:%.3f z:%.3f", player.GetUpDir().x, player.GetUpDir().y, player.GetUpDir().z);
-        ImGui::Text("Rotation: x:%.3f y:%.3f z:%.3f", player.GetRotation().x,  player.GetRotation().y,  player.GetRotation().z);
+        ImGui::Text("Application average %.2f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::Text("Forward direction: x:%.2f y:%.2f z:%.2f", player.GetForwardDir().x, player.GetForwardDir().y, player.GetForwardDir().z);
+        ImGui::Text("Right direction: x:%.2f y:%.2f z:%.2f", player.GetRightDir().x, player.GetRightDir().y, player.GetRightDir().z);
+        ImGui::Text("Up direction: x:%.2f y:%.2f z:%.2f", player.GetUpDir().x, player.GetUpDir().y, player.GetUpDir().z);
+        ImGui::Text("Rotation: x:%.2f y:%.2f z:%.2f", player.GetRotation().x,  player.GetRotation().y,  player.GetRotation().z);
         ImGui::Text("Hi");
         ImGui::End();
 
