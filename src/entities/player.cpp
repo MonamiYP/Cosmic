@@ -17,18 +17,27 @@ void Player::Render(Shader& shader) {
 
 glm::mat4 Player::GetQuaternionRotation() {
     glm::quat q_forwards = glm::angleAxis(glm::radians(m_rotation.z), m_forwards);
+    glm::quat q_right = glm::angleAxis(glm::radians(m_rotation.x), m_right);
+    glm::quat q_up = glm::angleAxis(glm::radians(m_rotation.y), m_up);
+    m_rotation.x = 0.0f;
+    m_rotation.y = 0.0f;
     m_rotation.z = 0.0f;
 
-    glm::mat4 rotationMat = glm::toMat4(q_forwards);
+    glm::mat4 forward_mat = glm::toMat4(q_forwards);
+    glm::mat4 right_mat = glm::toMat4(q_right);
+    glm::mat4 up_mat = glm::toMat4(q_up);
 
-    glm::quat quat_forwards = q_forwards * glm::quat(0, m_forwards.x, m_forwards.y, m_forwards.z) * glm::inverse(q_forwards);
+    glm::quat quat_forwards = q_up * q_right * q_forwards * glm::quat(0, m_forwards) * glm::inverse(q_forwards) * glm::inverse(q_right) * glm::inverse(q_up);
     m_forwards = glm::normalize(glm::vec3(quat_forwards.x, quat_forwards.y, quat_forwards.z));
-    glm::quat quat_up = q_forwards * glm::quat(0, m_up.x, m_up.y, m_up.z) * glm::inverse(q_forwards);
+
+    glm::quat quat_up = q_up * q_right * q_forwards * glm::quat(0, m_up) * glm::inverse(q_forwards) * glm::inverse(q_right) * glm::inverse(q_up);
     m_up = glm::normalize(glm::vec3(quat_up.x, quat_up.y, quat_up.z));
-    glm::quat quat_right = q_forwards * glm::quat(0, m_right.x, m_right.y, m_right.z) * glm::inverse(q_forwards);
+    glm::quat quat_right =  q_up * q_right * q_forwards * glm::quat(0, m_right) * glm::inverse(q_forwards) * glm::inverse(q_right) * glm::inverse(q_up);
     m_right = glm::normalize(glm::vec3(quat_right.x, quat_right.y, quat_right.z));
 
-    return rotationMat;
+    glm::mat4 rotation_mat = up_mat * right_mat * forward_mat;
+
+    return rotation_mat;
 }
 
 void Player::ProcessKeyboardInput(MovementDir dir, float deltaTime) {
@@ -46,8 +55,8 @@ void Player::ProcessKeyboardInput(MovementDir dir, float deltaTime) {
 }
 
 void Player::ProcessMouseInput(float xOffset, float yOffset) {
-    m_rotation.y -= xOffset * m_mouseSensitivity;
-    m_rotation.x += yOffset * m_mouseSensitivity;
+    m_rotation.y = -xOffset * m_mouseSensitivity;
+    m_rotation.x = yOffset * m_mouseSensitivity;
 }
 
 glm::mat4 Player::GetModelMatrix() {;
