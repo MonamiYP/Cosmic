@@ -1,31 +1,4 @@
-#include <iostream>
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-#include "VertexBuffer.hpp"
-#include "VertexBufferLayout.hpp"
-#include "VertexArray.hpp"
-#include "IndexBuffer.hpp"
-#include "Shader.hpp"
-#include "Renderer.hpp"
-#include "Texture.hpp"
-#include "Camera.hpp"
-#include "Player.hpp"
-#include "DebugLine.hpp"
-#include "SkyBox.hpp"
+#include "Requirements.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -140,12 +113,12 @@ int main() {
 
     SkyBox skybox;
     std::vector<std::string> faces { 
-        "../res/assets/space_cubemap/right.png", 
-        "../res/assets/space_cubemap/left.png", 
-        "../res/assets/space_cubemap/top.png", 
-        "../res/assets/space_cubemap/bottom.png", 
-        "../res/assets/space_cubemap/front.png", 
-        "../res/assets/space_cubemap/back.png" };
+        "../res/assets/space_skybox/right.png", 
+        "../res/assets/space_skybox/left.png", 
+        "../res/assets/space_skybox/top.png", 
+        "../res/assets/space_skybox/bottom.png", 
+        "../res/assets/space_skybox/front.png", 
+        "../res/assets/space_skybox/back.png" };
     unsigned int skyBoxTexture = skybox.loadSkyBox(faces);
 
     DebugLine x_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(10.0f, 0.0f, 0.0f));
@@ -168,10 +141,18 @@ int main() {
     std::string vertex_source = shader.ParseShader("../res/shaders/vertex_shader.vs");
     std::string fragment_source = shader.ParseShader("../res/shaders/fragment_shader.fs");
     shader.CreateShaderProgram(vertex_source, fragment_source);
+    shader.Bind();
+    shader.SetVector3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+    shader.SetVector3("lightPos", glm::vec3(1.0f, 0.0f, 0.0f));
+    shader.SetFloat("constant",  1.0f);
+    shader.SetFloat("linear",    0.014f);
+    shader.SetFloat("quadratic", 0.0007f);
 
     Shader lightShader;
     std::string light_fragment_source = shader.ParseShader("../res/shaders/light_shader.fs");
     lightShader.CreateShaderProgram(vertex_source, light_fragment_source);
+    lightShader.Bind();
+    lightShader.SetVector3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
 
     Shader lineShader;
     vertex_source = lineShader.ParseShader("../res/shaders/debug_line.vs");
@@ -184,12 +165,6 @@ int main() {
     skyBoxShader.CreateShaderProgram(vertex_source, fragment_source);
     skyBoxShader.Bind();
     skyBoxShader.SetInt("skybox", 0);
-
-    lightShader.Bind();
-    lightShader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
-    shader.Bind();
-    shader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
-    shader.SetVector3("lightPos", glm::vec3(1.0f, 0.0f, 0.0f));
 
     player.SetModelFromSource("../res/assets/spaceship/space_ship3.obj");
 

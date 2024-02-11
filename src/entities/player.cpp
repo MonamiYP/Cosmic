@@ -2,8 +2,14 @@
 
 Player::Player(glm::vec3 position, float yaw, float pitch) {
     m_forwards = glm::vec3(0.0f, 0.0f, -1.0f);
+    m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
     m_up = glm::vec3(0.0f, 1.0f, 0.0f);
     m_right = glm::vec3(1.0f, 0.0f, 0.0f);
+
+    m_movementSpeed = 8.0f;
+    m_rollSpeed = 50.0f;
+    m_mouseSensitivity = 0.02f;
+
     m_position = position;
 }
 

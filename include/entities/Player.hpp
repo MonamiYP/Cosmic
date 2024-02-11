@@ -35,12 +35,12 @@ class Player {
     private:
         glm::mat4 m_prev_rot = glm::mat4(1.0f);
 
-        float m_movementSpeed = 8.0f;
-        float m_rollSpeed = 80.0f;
-        float m_mouseSensitivity = 0.05f;
+        float m_movementSpeed;
+        float m_rollSpeed;
+        float m_mouseSensitivity;
 
         glm::vec3 m_position;
-        glm::vec3 m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 m_rotation;
         glm::vec3 m_scale;
 
         glm::vec3 m_forwards;
