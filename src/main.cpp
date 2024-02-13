@@ -1,30 +1,4 @@
-#include <iostream>
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-#include "VertexBuffer.hpp"
-#include "VertexBufferLayout.hpp"
-#include "VertexArray.hpp"
-#include "IndexBuffer.hpp"
-#include "Shader.hpp"
-#include "Renderer.hpp"
-#include "Texture.hpp"
-#include "Camera.hpp"
-#include "Player.hpp"
-#include "DebugLine.hpp"
+#include "Requirements.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -32,7 +6,7 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void window_focus_callback(GLFWwindow* window, int focused);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-Player player(glm::vec3(0.0f, -4.0f, -5.0f));
+Player player(glm::vec3(0.0f, 0.0f, 0.0f));
 Camera camera(&player);
 
 const float WINDOW_WIDTH = 1200.0f;
@@ -86,47 +60,47 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 330");
     
     float vertices[] = {
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-    -0.5f,  0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
 
-    -0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
+    -1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
 
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
 
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
+    -1.0f, -1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
 
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f, -0.5f,
+    -1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f, -1.0f,
 
-    -0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f
+    -1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f
 };
 
     VertexBuffer VBO(vertices, sizeof(vertices));
@@ -134,6 +108,18 @@ int main() {
     layout.AddAttribute(3);
     VertexArray lightVAO;
     lightVAO.AddBuffer(VBO, layout);
+    VertexArray skyboxVAO;
+    skyboxVAO.AddBuffer(VBO, layout);
+
+    SkyBox skybox;
+    std::vector<std::string> faces { 
+        "../res/assets/space_skybox/right.png", 
+        "../res/assets/space_skybox/left.png", 
+        "../res/assets/space_skybox/top.png", 
+        "../res/assets/space_skybox/bottom.png", 
+        "../res/assets/space_skybox/front.png", 
+        "../res/assets/space_skybox/back.png" };
+    unsigned int skyBoxTexture = skybox.loadSkyBox(faces);
 
     DebugLine x_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(10.0f, 0.0f, 0.0f));
     DebugLine y_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 10.0f, 0.0f));
@@ -155,21 +141,30 @@ int main() {
     std::string vertex_source = shader.ParseShader("../res/shaders/vertex_shader.vs");
     std::string fragment_source = shader.ParseShader("../res/shaders/fragment_shader.fs");
     shader.CreateShaderProgram(vertex_source, fragment_source);
+    shader.Bind();
+    shader.SetVector3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+    shader.SetVector3("lightPos", glm::vec3(1.0f, 0.0f, 0.0f));
+    shader.SetFloat("constant",  1.0f);
+    shader.SetFloat("linear",    0.014f);
+    shader.SetFloat("quadratic", 0.0007f);
 
     Shader lightShader;
     std::string light_fragment_source = shader.ParseShader("../res/shaders/light_shader.fs");
     lightShader.CreateShaderProgram(vertex_source, light_fragment_source);
+    lightShader.Bind();
+    lightShader.SetVector3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
 
     Shader lineShader;
     vertex_source = lineShader.ParseShader("../res/shaders/debug_line.vs");
     fragment_source = lineShader.ParseShader("../res/shaders/debug_line.fs");
     lineShader.CreateShaderProgram(vertex_source, fragment_source);
 
-    lightShader.Bind();
-    lightShader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
-    shader.Bind();
-    shader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
-    shader.SetVector3("lightPos", glm::vec3(1.0f, 0.0f, 0.0f));
+    Shader skyBoxShader;
+    vertex_source = skyBoxShader.ParseShader("../res/shaders/skybox.vs");
+    fragment_source = skyBoxShader.ParseShader("../res/shaders/skybox.fs");
+    skyBoxShader.CreateShaderProgram(vertex_source, fragment_source);
+    skyBoxShader.Bind();
+    skyBoxShader.SetInt("skybox", 0);
 
     player.SetModelFromSource("../res/assets/spaceship/space_ship3.obj");
 
@@ -217,6 +212,18 @@ int main() {
         camera.UpdateVectors();
         shader.SetVector3("viewPos", camera.GetPosition()); 
         player.Render(shader);
+
+        //SkyBox
+        glDepthFunc(GL_LEQUAL);
+        skyBoxShader.Bind();
+        skyBoxShader.SetMatrix4("u_view", glm::mat4(glm::mat3(camera.GetCameraView())));
+        skyBoxShader.SetMatrix4("u_projection", projection);
+
+        skyboxVAO.Bind();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDepthFunc(GL_LESS);
 
         // ImGUI
         ImGui_ImplOpenGL3_NewFrame();
