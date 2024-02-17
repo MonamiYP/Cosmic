@@ -52,7 +52,6 @@ int main() {
         return -1;
     }
 
-    glEnable(GL_DEPTH_TEST);
     glPatchParameteri(GL_PATCH_VERTICES, 4);
 
     IMGUI_CHECKVERSION();
@@ -116,8 +115,9 @@ int main() {
 
     // Planet
     Planet planet;
-    int resolution = 1;
-    planet.CreateMesh(50.0f, resolution);
+    int resolution = 20;
+    float diameter = 2000.0f;
+    planet.CreateMesh(diameter, resolution);
     std::vector<float> planet_vertices = planet.GetVertices();
     VertexBuffer planetVBO(&planet_vertices[0], planet_vertices.size() * sizeof(GLfloat));
     VertexArray planetVAO;
@@ -184,10 +184,14 @@ int main() {
     std::string tese_source = skyBoxShader.ParseShader("../res/shaders/planet.tese");
     fragment_source = skyBoxShader.ParseShader("../res/shaders/planet.fs");
     planetShader.CreateShaderProgram(vertex_source, tesc_source, tese_source, fragment_source);
+    planetShader.Bind();
+    planetShader.SetFloat("u_radius", diameter/2);
 
     player.SetModelFromSource("../res/assets/spaceship/space_ship3.obj");
 
     Renderer renderer;
+
+    glEnable(GL_DEPTH_TEST);
 
     while(!glfwWindowShouldClose(window)) {
         float currentTime = glfwGetTime();
@@ -201,7 +205,7 @@ int main() {
         lightVAO.Bind();
         lightShader.Bind();
         glm::mat4 view = camera.GetCameraView();
-        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 1.0f, 2000.0f);
         lightShader.SetMatrix4("u_view", view);
         lightShader.SetMatrix4("u_projection", projection);
 
@@ -245,14 +249,17 @@ int main() {
         glDepthFunc(GL_LESS);
 
         // Planet
+        glDepthMask(GL_TRUE);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         planetShader.Bind();
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(500.0f, 500.0f, -1000.0f));
+        planetShader.SetMatrix4("u_model", model);
         planetShader.SetMatrix4("u_view", view);
         planetShader.SetMatrix4("u_projection", projection);
-        planetShader.SetInt("u_outerTesselationLevel", outerTesselationLevel);
-        planetShader.SetInt("u_innerTesselationLevel", innerTesselationLevel);
+        planetShader.SetVector3("u_playerPos", player.GetPosition());
         planetVAO.Bind();
-        glDrawArrays(GL_PATCHES, 0, 4*resolution*resolution);
+        glDrawArrays(GL_PATCHES, 0, 4*resolution*resolution*6);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // ImGUI
@@ -263,8 +270,6 @@ int main() {
         ImGui::Begin("A window");
         ImGui::Text("Application average %.2f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("Player position: x:%.2f y:%.2f z:%.2f", player.GetPosition().x, player.GetPosition().y, player.GetPosition().z);
-        ImGui::SliderInt("Outer tesselation level:", &outerTesselationLevel, 0, 16);
-        ImGui::SliderInt("Inner tesselation level:", &innerTesselationLevel, 0, 16);
         ImGui::End();
 
         ImGui::Render();

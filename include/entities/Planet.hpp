@@ -8,10 +8,9 @@ class Planet {
 
         void Render(Shader& shader, const VertexArray& va, const IndexBuffer& ib);
         std::vector<float> GetVertices();
-        std::vector<unsigned int> GetIndices();
+        float GetRadius() { return m_radius; }
         void CreateMesh(float width, int resolution);
     private:
-        unsigned int m_VBO, m_VAO, m_IBO;
         std::vector<float> m_vertices;
-        std::vector<unsigned int> m_indices;
+        float m_radius;
 };
