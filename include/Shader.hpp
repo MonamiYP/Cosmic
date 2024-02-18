@@ -20,13 +20,10 @@ class Shader {
         unsigned int CompileShader(unsigned int type, const std::string& source);
         std::string ParseShader(const std::string& filepath);
         void CreateShaderProgram(const std::string& vertexShader, const std::string& fragmentShader);
-        void CreateShaderProgram(const std::string& vertexShader, const std::string& tescShader, 
-            const std::string& teseShader, const std::string& fragmentShader);
 
         int GetUniformLocation(const std::string& name);
 
         void SetInt(const std::string& name, int value);
-        void SetFloat(const std::string& name, float value);
         void SetVector3(const std::string& name, const glm::vec3& vector);
         void SetMatrix4(const std::string& name, const glm::mat4& matrix);
 };

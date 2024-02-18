@@ -1,13 +1,37 @@
-#include "Requirements.hpp"
+#include <iostream>
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+#include "VertexBuffer.hpp"
+#include "VertexBufferLayout.hpp"
+#include "VertexArray.hpp"
+#include "IndexBuffer.hpp"
+#include "Shader.hpp"
+#include "Renderer.hpp"
+#include "Texture.hpp"
+#include "Camera.hpp"
+#include "Model.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
+void scroll_callback(GLFWwindow* window, double xScroll, double yScroll);
 void window_focus_callback(GLFWwindow* window, int focused);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-Player player(glm::vec3(0.0f, 0.0f, 0.0f));
-Camera camera(&player);
+Camera camera(glm::vec3(0.0f, 0.0f, 8.0f));
 
 const float WINDOW_WIDTH = 1200.0f;
 const float WINDOW_HEIGHT = 800.0f;
@@ -17,10 +41,6 @@ float lastY =  WINDOW_HEIGHT / 2.0;
 
 float deltaTime;
 float lastTime;
-
-bool guiActive = false;
-int outerTesselationLevel = 15;
-int innerTesselationLevel = 15;
 
 int main() {
     if (!glfwInit())
@@ -43,8 +63,8 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
-    glfwSetKeyCallback(window, key_callback);
     glfwSetWindowFocusCallback(window, window_focus_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -52,7 +72,7 @@ int main() {
         return -1;
     }
 
-    glPatchParameteri(GL_PATCH_VERTICES, 4);
+    glEnable(GL_DEPTH_TEST);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -62,137 +82,81 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 330");
     
     float vertices[] = {
-    -1.0f,  1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
 
-    -1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
 
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
 
-    -1.0f, -1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
 
-    -1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f, -1.0f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f, -0.5f,
 
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f
+    -0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f
 };
+
+    // unsigned int indices[] = {  
+    //     0, 1, 3,   // first triangle
+    //     1, 2, 3    // second triangle
+    // };
 
     VertexBuffer VBO(vertices, sizeof(vertices));
     VertexBufferLayout layout;
     layout.AddAttribute(3);
     VertexArray lightVAO;
     lightVAO.AddBuffer(VBO, layout);
-    VertexArray skyboxVAO;
-    skyboxVAO.AddBuffer(VBO, layout);
-
-    // Planet
-    Planet planet;
-    int resolution = 20;
-    float diameter = 2000.0f;
-    planet.CreateMesh(diameter, resolution);
-    std::vector<float> planet_vertices = planet.GetVertices();
-    VertexBuffer planetVBO(&planet_vertices[0], planet_vertices.size() * sizeof(GLfloat));
-    VertexArray planetVAO;
-    planetVAO.AddBuffer(planetVBO, layout);
-
-    SkyBox skybox;
-    std::vector<std::string> faces { 
-        "../res/assets/space_skybox/right.png", 
-        "../res/assets/space_skybox/left.png", 
-        "../res/assets/space_skybox/top.png", 
-        "../res/assets/space_skybox/bottom.png", 
-        "../res/assets/space_skybox/front.png", 
-        "../res/assets/space_skybox/back.png" };
-    unsigned int skyBoxTexture = skybox.loadSkyBox(faces);
-
-    DebugLine x_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(10.0f, 0.0f, 0.0f));
-    DebugLine y_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 10.0f, 0.0f));
-    DebugLine z_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 10.0f));
-    std::vector<float> x_line_vertex = x_line.GetVertices();
-    std::vector<float> y_line_vertex = y_line.GetVertices();
-    std::vector<float> z_line_vertex = z_line.GetVertices();
-    VertexBuffer x_lineVBO(&x_line_vertex[0], sizeof(x_line_vertex));
-    VertexBuffer y_lineVBO(&y_line_vertex[0], sizeof(y_line_vertex));
-    VertexBuffer z_lineVBO(&z_line_vertex[0], sizeof(z_line_vertex));
-    VertexArray x_lineVAO;
-    VertexArray y_lineVAO;
-    VertexArray z_lineVAO;
-    x_lineVAO.AddBuffer(x_lineVBO, layout);
-    y_lineVAO.AddBuffer(y_lineVBO, layout);
-    z_lineVAO.AddBuffer(z_lineVBO, layout);
 
     Shader shader;
     std::string vertex_source = shader.ParseShader("../res/shaders/vertex_shader.vs");
     std::string fragment_source = shader.ParseShader("../res/shaders/fragment_shader.fs");
     shader.CreateShaderProgram(vertex_source, fragment_source);
-    shader.Bind();
-    shader.SetVector3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
-    shader.SetVector3("lightPos", glm::vec3(1.0f, 0.0f, 0.0f));
-    shader.SetFloat("constant",  1.0f);
-    shader.SetFloat("linear",    0.014f);
-    shader.SetFloat("quadratic", 0.0007f);
 
     Shader lightShader;
     std::string light_fragment_source = shader.ParseShader("../res/shaders/light_shader.fs");
     lightShader.CreateShaderProgram(vertex_source, light_fragment_source);
+
     lightShader.Bind();
-    lightShader.SetVector3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+    lightShader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
+    shader.Bind();
+    shader.SetVector3("lightColor",  glm::vec3(1.0f, 0.6f, 0.6f));
+    shader.SetVector3("lightPos", glm::vec3(1.0f, 0.0f, 0.0f));
 
-    Shader lineShader;
-    vertex_source = lineShader.ParseShader("../res/shaders/debug_line.vs");
-    fragment_source = lineShader.ParseShader("../res/shaders/debug_line.fs");
-    lineShader.CreateShaderProgram(vertex_source, fragment_source);
+    Texture texture("../res/assets/container.jpg");
+    texture.Bind();
 
-    Shader skyBoxShader;
-    vertex_source = skyBoxShader.ParseShader("../res/shaders/skybox.vs");
-    fragment_source = skyBoxShader.ParseShader("../res/shaders/skybox.fs");
-    skyBoxShader.CreateShaderProgram(vertex_source, fragment_source);
-    skyBoxShader.Bind();
-    skyBoxShader.SetInt("skybox", 0);
-
-    Shader planetShader;
-    vertex_source = skyBoxShader.ParseShader("../res/shaders/planet.vs");
-    std::string tesc_source = skyBoxShader.ParseShader("../res/shaders/planet.tesc");
-    std::string tese_source = skyBoxShader.ParseShader("../res/shaders/planet.tese");
-    fragment_source = skyBoxShader.ParseShader("../res/shaders/planet.fs");
-    planetShader.CreateShaderProgram(vertex_source, tesc_source, tese_source, fragment_source);
-    planetShader.Bind();
-    planetShader.SetFloat("u_radius", diameter/2);
-
-    player.SetModelFromSource("../res/assets/spaceship/space_ship3.obj");
+    Model spaceship_model("../res/assets/spaceship/space_ship3.obj");
 
     Renderer renderer;
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);  
 
     while(!glfwWindowShouldClose(window)) {
         float currentTime = glfwGetTime();
@@ -206,7 +170,7 @@ int main() {
         lightVAO.Bind();
         lightShader.Bind();
         glm::mat4 view = camera.GetCameraView();
-        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 1.0f, diameter*2);
+        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 0.1f, 100.0f);
         lightShader.SetMatrix4("u_view", view);
         lightShader.SetMatrix4("u_projection", projection);
 
@@ -216,68 +180,29 @@ int main() {
         lightShader.SetMatrix4("u_model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // Line
-        lineShader.Bind();
-        lineShader.SetMatrix4("u_view", view);
-        lineShader.SetMatrix4("u_projection", projection);
-        lineShader.SetMatrix4("u_model", x_line.GetModelMatrix());
-        lineShader.SetVector3("color",  glm::vec3(1.0f, 0.0f, 0.0f));
-        x_line.Render(x_lineVAO);
-        lineShader.SetVector3("color",  glm::vec3(1.0f, 1.0f, 0.0f));
-        y_line.Render(y_lineVAO);
-        lineShader.SetVector3("color",  glm::vec3(0.0f, 1.0f, 1.0f));
-        z_line.Render(z_lineVAO);
-    
         // Spaceship
         shader.Bind();
         shader.SetMatrix4("u_view", view);
         shader.SetMatrix4("u_projection", projection);
-        shader.SetMatrix4("u_model", player.GetModelMatrix());
-        camera.UpdateVectors();
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        shader.SetMatrix4("u_model", model);
         shader.SetVector3("viewPos", camera.GetPosition()); 
-        player.Render(shader);
+        spaceship_model.Draw(shader);
 
-        //SkyBox
-        glDepthFunc(GL_LEQUAL);
-        skyBoxShader.Bind();
-        skyBoxShader.SetMatrix4("u_view", glm::mat4(glm::mat3(camera.GetCameraView())));
-        skyBoxShader.SetMatrix4("u_projection", projection);
-
-        skyboxVAO.Bind();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxTexture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glDepthFunc(GL_LESS);
-
-        // Planet
-        glDepthMask(GL_TRUE);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        planetShader.Bind();
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(diameter/2, diameter/2, -diameter/2));
-        planetShader.SetMatrix4("u_model", model);
-        planetShader.SetMatrix4("u_view", view);
-        planetShader.SetMatrix4("u_projection", projection);
-        planetShader.SetVector3("u_playerPos", player.GetPosition());
-        planetVAO.Bind();
-        glDrawArrays(GL_PATCHES, 0, 4*resolution*resolution*6);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-        // ImGUI
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         ImGui::Begin("A window");
-        ImGui::Text("Application average %.2f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::Text("Player position: x:%.2f y:%.2f z:%.2f", player.GetPosition().x, player.GetPosition().y, player.GetPosition().z);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwPollEvents();    
     }
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -288,37 +213,25 @@ int main() {
 }
 
 void processInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if(!guiActive) {
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            player.ProcessKeyboardInput(FORWARDS, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            player.ProcessKeyboardInput(BACKWARDS, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            player.ProcessKeyboardInput(LEFT, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            player.ProcessKeyboardInput(RIGHT, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-            player.ProcessKeyboardInput(UP, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            player.ProcessKeyboardInput(DOWN, deltaTime);
-    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboardInput(FORWARDS, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboardInput(BACKWARDS, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboardInput(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboardInput(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.ProcessKeyboardInput(UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.ProcessKeyboardInput(DOWN, deltaTime);
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
-        if (!guiActive) {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            glfwSetCursorPosCallback(window, 0);
-        } else {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            glfwSetCursorPos(window, lastX, lastY);
-            glfwSetCursorPosCallback(window, mouse_callback);
-        }
-        guiActive = !guiActive;
-    }
+void scroll_callback(GLFWwindow* window, double xScroll, double yScroll) {
+    camera.ProcessScrollInput(yScroll);
 }
 
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
@@ -327,7 +240,7 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
     lastX = xPos;
     lastY = yPos;
 
-    player.ProcessMouseInput(xOffset, yOffset);
+    camera.ProcessMouseInput(xOffset, yOffset);
 }
 
 void window_focus_callback(GLFWwindow* window, int focused) {

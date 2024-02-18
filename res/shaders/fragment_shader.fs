@@ -12,14 +12,10 @@ uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 
-uniform float constant;
-uniform float linear;
-uniform float quadratic;
-
 void main()
 {    
     // Ambient
-    float ambientStrength = 0.2;
+    float ambientStrength = 0.25;
     vec3 ambient = ambientStrength * lightColor;
 
     // Diffuse
@@ -29,17 +25,13 @@ void main()
     vec3 diffuse = diff * lightColor;
 
     // Specular
-    float specularStrength = 0.6;
+    float specularStrength = 0.5;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     vec3 specular = specularStrength * spec * lightColor;  
 
-    // Distance attenuation
-    float distance = length(lightPos - FragPos);
-    float attenuation = 1.0 / (constant + linear * distance + quadratic * (distance * distance));
-
-    vec3 res = ambient + (diffuse + specular) * attenuation;
+    vec3 res = ambient + diffuse + specular;
     vec4 objColor = texture(texture_diffuse1, TexCoords);
     
     FragColor = vec4(objColor * vec4(res, 1.0));
