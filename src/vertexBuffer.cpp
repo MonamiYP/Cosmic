@@ -1,10 +1,9 @@
 #include "VertexBuffer.hpp"
-#include "Renderer.hpp"
 
 VertexBuffer::VertexBuffer(const void* data, unsigned int size) {
-    GLCall(glGenBuffers(1, &m_bufferID));
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_bufferID));
-    GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+    glGenBuffers(1, &m_bufferID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
+    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
 VertexBuffer::~VertexBuffer() {
@@ -12,7 +11,7 @@ VertexBuffer::~VertexBuffer() {
 }
 
 void VertexBuffer::Bind() const {
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_bufferID));
+    glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
 }
 
 void VertexBuffer::Unbind() const {

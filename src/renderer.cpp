@@ -16,7 +16,7 @@ bool GLLogCall(const char* function, const char* file, int line) {
 void Renderer::Draw(const VertexArray& VAO, const IndexBuffer& IBO, const Shader& shader) const {
     shader.Bind();
     VAO.Bind();
-    GLCall(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, 0));
+    glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, 0);
 }
 
 void Renderer::Clear() const {

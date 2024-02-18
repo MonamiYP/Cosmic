@@ -6,7 +6,6 @@
 *.lo
 *.o
 *.obj
-!/res/**
 
 # Precompiled Headers
 *.gch
@@ -46,5 +45,4 @@ CTestTestfile.cmake
 _deps
 build/
 
-.DS_Store
 .vscode
