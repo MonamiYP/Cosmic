@@ -192,6 +192,7 @@ int main() {
     Renderer renderer;
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);  
 
     while(!glfwWindowShouldClose(window)) {
         float currentTime = glfwGetTime();
@@ -205,7 +206,7 @@ int main() {
         lightVAO.Bind();
         lightShader.Bind();
         glm::mat4 view = camera.GetCameraView();
-        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 1.0f, 2000.0f);
+        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 1.0f, diameter*2);
         lightShader.SetMatrix4("u_view", view);
         lightShader.SetMatrix4("u_projection", projection);
 
@@ -253,7 +254,7 @@ int main() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         planetShader.Bind();
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(500.0f, 500.0f, -1000.0f));
+        model = glm::translate(model, glm::vec3(diameter/2, diameter/2, -diameter/2));
         planetShader.SetMatrix4("u_model", model);
         planetShader.SetMatrix4("u_view", view);
         planetShader.SetMatrix4("u_projection", projection);

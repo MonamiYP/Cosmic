@@ -8,20 +8,20 @@ void Planet::CreateMesh(float diameter, int resolution) {
     for (unsigned int j = 0; j < resolution; j++) {
         // Face 1
         for (unsigned int i = 0; i < resolution; i++) {
-            m_vertices.push_back(i * segment_width - diameter/2);
-            m_vertices.push_back(j * segment_width - diameter/2);
+            m_vertices.push_back((i+1) * segment_width - diameter/2);
+            m_vertices.push_back((j+1) * segment_width - diameter/2);
             m_vertices.push_back(-diameter/2);
 
             m_vertices.push_back((i+1) * segment_width - diameter/2);
             m_vertices.push_back(j * segment_width - diameter/2);
             m_vertices.push_back(-diameter/2);
-
+            
             m_vertices.push_back(i * segment_width - diameter/2);
             m_vertices.push_back((j+1) * segment_width - diameter/2);
             m_vertices.push_back(-diameter/2);
 
-            m_vertices.push_back((i+1) * segment_width - diameter/2);
-            m_vertices.push_back((j+1) * segment_width - diameter/2);
+            m_vertices.push_back(i * segment_width - diameter/2);
+            m_vertices.push_back(j * segment_width - diameter/2);
             m_vertices.push_back(-diameter/2);
         }
     }
@@ -69,8 +69,8 @@ void Planet::CreateMesh(float diameter, int resolution) {
     for (unsigned int j = 0; j < resolution; j++) {
         for (unsigned int i = 0; i < resolution; i++) {
             m_vertices.push_back(-diameter/2);
-            m_vertices.push_back(i * segment_width - diameter/2);
-            m_vertices.push_back(j * segment_width - diameter/2);
+            m_vertices.push_back((i+1) * segment_width - diameter/2);
+            m_vertices.push_back((j+1) * segment_width - diameter/2);
 
             m_vertices.push_back(-diameter/2);
             m_vertices.push_back((i+1) * segment_width - diameter/2);
@@ -81,8 +81,8 @@ void Planet::CreateMesh(float diameter, int resolution) {
             m_vertices.push_back((j+1) * segment_width - diameter/2);
 
             m_vertices.push_back(-diameter/2);
-            m_vertices.push_back((i+1) * segment_width - diameter/2);
-            m_vertices.push_back((j+1) * segment_width - diameter/2);
+            m_vertices.push_back(i * segment_width - diameter/2);
+            m_vertices.push_back(j * segment_width - diameter/2);
         }
     }
     // Face 5
@@ -108,9 +108,9 @@ void Planet::CreateMesh(float diameter, int resolution) {
     // Face 6
     for (unsigned int j = 0; j < resolution; j++) {
         for (unsigned int i = 0; i < resolution; i++) {
-            m_vertices.push_back(i * segment_width - diameter/2);
+            m_vertices.push_back((i+1) * segment_width - diameter/2);
             m_vertices.push_back(diameter/2);
-            m_vertices.push_back(j * segment_width - diameter/2);
+            m_vertices.push_back((j+1) * segment_width - diameter/2);
 
             m_vertices.push_back((i+1) * segment_width - diameter/2);
             m_vertices.push_back(diameter/2);
@@ -119,10 +119,10 @@ void Planet::CreateMesh(float diameter, int resolution) {
             m_vertices.push_back(i * segment_width - diameter/2);
             m_vertices.push_back(diameter/2);
             m_vertices.push_back((j+1) * segment_width - diameter/2);
-
-            m_vertices.push_back((i+1) * segment_width - diameter/2);
+            
+            m_vertices.push_back(i * segment_width - diameter/2);
             m_vertices.push_back(diameter/2);
-            m_vertices.push_back((j+1) * segment_width - diameter/2);
+            m_vertices.push_back(j * segment_width - diameter/2);
         }
     }
 }

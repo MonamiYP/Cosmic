@@ -11,10 +11,10 @@ uniform mat4 u_model;
 
 void main() {
     if (gl_InvocationID == 0) {
-        const int MIN_TESS_LEVEL = 1;
-        const int MAX_TESS_LEVEL = 24;
-        const float MIN_DISTANCE = 100;
-        float MAX_DISTANCE = u_radius;
+        const int MIN_TESS_LEVEL = 2;
+        const int MAX_TESS_LEVEL = 32;
+        float MIN_DISTANCE = 100;
+        float MAX_DISTANCE = u_radius/2;
 
         // Get position of vertices and player in world space
         vec4 worldPos00 = gl_in[0].gl_Position;

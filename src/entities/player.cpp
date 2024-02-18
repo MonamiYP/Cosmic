@@ -6,7 +6,7 @@ Player::Player(glm::vec3 position, float yaw, float pitch) {
     m_up = glm::vec3(0.0f, 1.0f, 0.0f);
     m_right = glm::vec3(1.0f, 0.0f, 0.0f);
 
-    m_movementSpeed = 500.0f;
+    m_movementSpeed = 100.0f;
     m_rollSpeed = 50.0f;
     m_mouseSensitivity = 0.02f;
 

@@ -1,6 +1,6 @@
 #include "Camera.hpp"
 
-Camera::Camera(Player* player) : m_fov(80.0f), m_distanceFromPlayer(20.0f), m_pitch(20.0f) {
+Camera::Camera(Player* player) : m_fov(70.0f), m_distanceFromPlayer(25.0f), m_pitch(15.0f) {
     m_player = player;
 
     UpdateVectors();
