@@ -23,6 +23,8 @@
 #include "Renderer.hpp"
 #include "Texture.hpp"
 #include "Camera.hpp"
-#include "Player.hpp"
+
 #include "DebugLine.hpp"
+#include "Planet.hpp"
+#include "Player.hpp"
 #include "SkyBox.hpp"

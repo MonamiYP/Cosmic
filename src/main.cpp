@@ -19,6 +19,8 @@ float deltaTime;
 float lastTime;
 
 bool guiActive = false;
+int outerTesselationLevel = 15;
+int innerTesselationLevel = 15;
 
 int main() {
     if (!glfwInit())
@@ -50,7 +52,7 @@ int main() {
         return -1;
     }
 
-    glEnable(GL_DEPTH_TEST);
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -111,6 +113,16 @@ int main() {
     VertexArray skyboxVAO;
     skyboxVAO.AddBuffer(VBO, layout);
 
+    // Planet
+    Planet planet;
+    int resolution = 20;
+    float diameter = 2000.0f;
+    planet.CreateMesh(diameter, resolution);
+    std::vector<float> planet_vertices = planet.GetVertices();
+    VertexBuffer planetVBO(&planet_vertices[0], planet_vertices.size() * sizeof(GLfloat));
+    VertexArray planetVAO;
+    planetVAO.AddBuffer(planetVBO, layout);
+
     SkyBox skybox;
     std::vector<std::string> faces { 
         "../res/assets/space_skybox/right.png", 
@@ -166,9 +178,21 @@ int main() {
     skyBoxShader.Bind();
     skyBoxShader.SetInt("skybox", 0);
 
+    Shader planetShader;
+    vertex_source = skyBoxShader.ParseShader("../res/shaders/planet.vs");
+    std::string tesc_source = skyBoxShader.ParseShader("../res/shaders/planet.tesc");
+    std::string tese_source = skyBoxShader.ParseShader("../res/shaders/planet.tese");
+    fragment_source = skyBoxShader.ParseShader("../res/shaders/planet.fs");
+    planetShader.CreateShaderProgram(vertex_source, tesc_source, tese_source, fragment_source);
+    planetShader.Bind();
+    planetShader.SetFloat("u_radius", diameter/2);
+
     player.SetModelFromSource("../res/assets/spaceship/space_ship3.obj");
 
     Renderer renderer;
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);  
 
     while(!glfwWindowShouldClose(window)) {
         float currentTime = glfwGetTime();
@@ -182,7 +206,7 @@ int main() {
         lightVAO.Bind();
         lightShader.Bind();
         glm::mat4 view = camera.GetCameraView();
-        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 1.0f, diameter*2);
         lightShader.SetMatrix4("u_view", view);
         lightShader.SetMatrix4("u_projection", projection);
 
@@ -225,6 +249,20 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glDepthFunc(GL_LESS);
 
+        // Planet
+        glDepthMask(GL_TRUE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        planetShader.Bind();
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(diameter/2, diameter/2, -diameter/2));
+        planetShader.SetMatrix4("u_model", model);
+        planetShader.SetMatrix4("u_view", view);
+        planetShader.SetMatrix4("u_projection", projection);
+        planetShader.SetVector3("u_playerPos", player.GetPosition());
+        planetVAO.Bind();
+        glDrawArrays(GL_PATCHES, 0, 4*resolution*resolution*6);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
         // ImGUI
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -253,18 +291,20 @@ void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        player.ProcessKeyboardInput(FORWARDS, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        player.ProcessKeyboardInput(BACKWARDS, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        player.ProcessKeyboardInput(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        player.ProcessKeyboardInput(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        player.ProcessKeyboardInput(UP, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        player.ProcessKeyboardInput(DOWN, deltaTime);
+    if(!guiActive) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            player.ProcessKeyboardInput(FORWARDS, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            player.ProcessKeyboardInput(BACKWARDS, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            player.ProcessKeyboardInput(LEFT, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            player.ProcessKeyboardInput(RIGHT, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            player.ProcessKeyboardInput(UP, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            player.ProcessKeyboardInput(DOWN, deltaTime);
+    }
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -273,6 +313,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             glfwSetCursorPosCallback(window, 0);
         } else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetCursorPos(window, lastX, lastY);
             glfwSetCursorPosCallback(window, mouse_callback);
         }
         guiActive = !guiActive;
