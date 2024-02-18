@@ -33,6 +33,36 @@ void Shader::CreateShaderProgram(const std::string& vertexShader, const std::str
     m_shaderProgramID = shaderProgram;
 }
 
+void Shader::CreateShaderProgram(const std::string& vertexShader, const std::string& tescShader, const std::string& teseShader, const std::string& fragmentShader) {
+    unsigned int shaderProgram = glCreateProgram();
+    unsigned int vertex_shader = CompileShader(GL_VERTEX_SHADER, vertexShader);
+    unsigned int tesc_shader = CompileShader(GL_TESS_CONTROL_SHADER, tescShader);
+    unsigned int tese_shader = CompileShader(GL_TESS_EVALUATION_SHADER, teseShader);
+    unsigned int fragment_shader = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+    glAttachShader(shaderProgram, vertex_shader);
+    glAttachShader(shaderProgram, tesc_shader);
+    glAttachShader(shaderProgram, tese_shader);
+    glAttachShader(shaderProgram, fragment_shader);
+    glLinkProgram(shaderProgram);
+
+    int success;
+    char infoLog[512];
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+    glValidateProgram(shaderProgram);
+
+    glDeleteShader(vertex_shader);
+    glDeleteShader(tesc_shader);
+    glDeleteShader(tese_shader);
+    glDeleteShader(fragment_shader);
+
+    m_shaderProgramID = shaderProgram;
+}
+
 std::string Shader::ParseShader(const std::string& filepath) {
     std::ifstream file(filepath);
     std::string str;
@@ -62,7 +92,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
     if (success == GL_FALSE) {
         glGetShaderInfoLog(id, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER:"<<
-        (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT")
+        (type == GL_VERTEX_SHADER ? "VERTEX" : (type == GL_TESS_CONTROL_SHADER ? "TESSELATION CONTROL" : ((type == GL_TESS_EVALUATION_SHADER ? "TESSELATION EVALUTAION" : "FRAGMENT"))))
         <<":COMPILATION_FAILED\n" << infoLog << std::endl;
         glDeleteShader(id);
         return 0;
@@ -85,6 +115,10 @@ int Shader::GetUniformLocation(const std::string& name) {
 
 void Shader::SetInt(const std::string& name, int value) {
     glUniform1i(GetUniformLocation(name), value);
+}
+
+void Shader::SetFloat(const std::string& name, float value) {
+    glUniform1f(GetUniformLocation(name), value);
 }
 
 void Shader::SetVector3(const std::string& name, const glm::vec3& vector) {

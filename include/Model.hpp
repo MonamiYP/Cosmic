@@ -17,7 +17,8 @@
 
 class Model {
     public:
-        Model(std::string const& path);
+        Model();
+        void SetModelFromSource(std::string const& path);
         void Draw(Shader& shader);
         
     private:

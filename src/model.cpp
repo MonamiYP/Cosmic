@@ -1,6 +1,8 @@
 #include "Model.hpp"
 
-Model::Model(std::string const& path) {
+Model::Model() {}
+
+void Model::SetModelFromSource(std::string const& path) {
     LoadModel(path);
 }
 
