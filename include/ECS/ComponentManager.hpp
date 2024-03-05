@@ -2,6 +2,7 @@
 
 #include "Types.hpp"
 #include "ComponentArray.hpp"
+#include <iostream>
 
 class ComponentManager {
     public:
@@ -20,7 +21,7 @@ class ComponentManager {
         ComponentType GetComponentType() {
             const char* typeName = typeid(T).name();
             if (m_ComponentTypes.find(typeName) == m_ComponentTypes.end())
-                std::cout << "ERROR::ECS::COMPONENT_MANAGER::Component not registered before use" << std::endl;
+                std::cout << "ERROR::ECS::COMPONENT_MANAGER::Component" << typeName << " not registered before use" << std::endl;
             
             return m_ComponentTypes[typeName];
         }
@@ -57,7 +58,7 @@ class ComponentManager {
         std::shared_ptr<ComponentArray<T>> GetComponentArray() {
             const char* typeName = typeid(T).name();
             if (m_ComponentTypes.find(typeName) == m_ComponentTypes.end())
-                std::cout << "ERROR::ECS::COMPONENT_MANAGER::Component not registered before use" << std::endl;
+                std::cout << "ERROR::ECS::COMPONENT_MANAGER::Component " << typeName << " not registered before use" << std::endl;
             
             return std::static_pointer_cast<ComponentArray<T>>(m_ComponentArrays[typeName]);
         }

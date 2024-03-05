@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.hpp"
+#include <iostream>
 
 ///////////////
 // TODO: avoid thevirtual inheritance here, this might help: https://savas.ca/nomad
@@ -26,7 +27,7 @@ class ComponentArray : public IComponentArray {
             m_Size++;
         }
 
-        void RemoveData(Entity entity, T component) {
+        void RemoveData(Entity entity) {
             if (m_EntityToIndexMap.find(entity) == m_EntityToIndexMap.end())
                 std::cout << "ERROR::ECS::COMPONENT_ARRAY::Component not found" << std::endl;
             
@@ -59,6 +60,6 @@ class ComponentArray : public IComponentArray {
     private:
         std::array<T, MAX_ENTITIES> m_ComponentArray;
         std::unordered_map<Entity, size_t> m_EntityToIndexMap;
-        std::unordered_map<sixze_t, Entity> m_IndexToEntityMap;
+        std::unordered_map<size_t, Entity> m_IndexToEntityMap;
         size_t m_Size;
 };

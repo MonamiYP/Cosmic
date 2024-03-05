@@ -4,6 +4,7 @@
 #include "EntityManager.hpp"
 #include "SystemManager.hpp"
 #include "Types.hpp"
+#include <memory>
 
 class ECS {
     public:

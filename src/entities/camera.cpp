@@ -1,6 +1,6 @@
 #include "Camera.hpp"
 
-Camera::Camera(Player* player) : m_fov(70.0f), m_distanceFromPlayer(25.0f), m_pitch(15.0f) {
+Camera::Camera(Player* player) : m_fov(70.0f), m_distanceFromPlayer(25.0f) {
     m_player = player;
 
     UpdateVectors();
@@ -9,17 +9,6 @@ Camera::Camera(Player* player) : m_fov(70.0f), m_distanceFromPlayer(25.0f), m_pi
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : m_fov(40.0f), m_distanceFromPlayer(10.0f) {
     m_position = position;
     m_worldUp = up;
-    m_yaw = yaw;
-    m_pitch = pitch;
-
-    glm::vec3 frontDir;
-    frontDir.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-    frontDir.y = sin(glm::radians(m_pitch));
-    frontDir.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-
-    m_forwards = glm::normalize(frontDir);
-    m_right = glm::normalize(glm::cross(m_forwards, m_worldUp));
-    m_up  = glm::normalize(glm::cross(m_right, m_forwards));
 }
 
 glm::mat4 Camera::GetCameraView() {
@@ -27,7 +16,7 @@ glm::mat4 Camera::GetCameraView() {
 }
 
 void Camera::UpdateVectors() {
-    float pitch = glm::radians(m_pitch);
+    float pitch = glm::radians(15.0f);
     m_forwards = m_player->GetForwardDir()*cos(pitch) - m_player->GetUpDir()*sin(pitch);
     m_forwards = glm::normalize(m_forwards);
     m_right = m_player->GetRightDir();
