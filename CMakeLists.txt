@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5.0)
 
 project(Space_Explorer)
 
@@ -21,6 +21,7 @@ add_subdirectory(include/assimp)
 target_include_directories(${PROJECT_NAME} 
     PUBLIC include/glfw/include
     PUBLIC include/assimp/include
+    PUBLIC res
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/entities
 )

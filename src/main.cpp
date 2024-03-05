@@ -114,10 +114,8 @@ int main() {
     skyboxVAO.AddBuffer(VBO, layout);
 
     // Planet
-    Planet planet;
-    int resolution = 20;
-    float diameter = 2000.0f;
-    planet.CreateMesh(diameter, resolution);
+    Planet planet(20, 2000.0f);
+    planet.CreateMesh();
     std::vector<float> planet_vertices = planet.GetVertices();
     VertexBuffer planetVBO(&planet_vertices[0], planet_vertices.size() * sizeof(GLfloat));
     VertexArray planetVAO;
@@ -185,7 +183,7 @@ int main() {
     fragment_source = skyBoxShader.ParseShader("../res/shaders/planet.fs");
     planetShader.CreateShaderProgram(vertex_source, tesc_source, tese_source, fragment_source);
     planetShader.Bind();
-    planetShader.SetFloat("u_radius", diameter/2);
+    planetShader.SetFloat("u_radius", planet.GetRadius());
 
     player.SetModelFromSource("../res/assets/spaceship/space_ship3.obj");
 
@@ -206,7 +204,7 @@ int main() {
         lightVAO.Bind();
         lightShader.Bind();
         glm::mat4 view = camera.GetCameraView();
-        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 1.0f, diameter*2);
+        glm::mat4 projection = glm::perspective(camera.GetFOV(), WINDOW_WIDTH/WINDOW_HEIGHT, 1.0f, planet.GetRadius()*2);
         lightShader.SetMatrix4("u_view", view);
         lightShader.SetMatrix4("u_projection", projection);
 
@@ -254,13 +252,13 @@ int main() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         planetShader.Bind();
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(diameter/2, diameter/2, -diameter/2));
+        model = glm::translate(model, glm::vec3(planet.GetRadius(), planet.GetRadius(), -planet.GetRadius()));
         planetShader.SetMatrix4("u_model", model);
         planetShader.SetMatrix4("u_view", view);
         planetShader.SetMatrix4("u_projection", projection);
         planetShader.SetVector3("u_playerPos", player.GetPosition());
         planetVAO.Bind();
-        glDrawArrays(GL_PATCHES, 0, 4*resolution*resolution*6);
+        glDrawArrays(GL_PATCHES, 0, 4*planet.GetResolution()*planet.GetResolution()*6);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // ImGUI
