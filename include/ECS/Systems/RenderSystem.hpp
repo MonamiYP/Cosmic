@@ -1,26 +1,26 @@
 #pragma once
 
-#include "ECS/ECS.hpp"
-#include "ECS/System.hpp"
-#include "Components/TransformComponent.hpp"
-#include "Components/OrientationComponent.hpp"
-#include "Components/CameraComponent.hpp"
+#include "RequirementsECS.hpp"
+
+#include <iostream>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
+#include "Renderer.hpp"
 #include "Shader.hpp"
 #include "Player.hpp"
 #include "VertexArray.hpp"
 #include "VertexBuffer.hpp"
 #include "VertexBufferLayout.hpp"
 
+#include "Engine.hpp"
+
 class RenderSystem : public System {
     public:
         void Init();
-        void Update(float deltaTime);
+        void Draw(float deltaTime);
 
     private:
         Entity m_Camera;

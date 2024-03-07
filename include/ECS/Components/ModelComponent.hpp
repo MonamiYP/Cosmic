@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Model.hpp"
+#include "Mesh.hpp"
 
 struct ModelComponent {
-    Model* model;
+    Mesh* mesh;
 };

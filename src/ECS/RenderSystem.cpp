@@ -1,11 +1,6 @@
 #include "Systems/RenderSystem.hpp"
-#include <iostream>
-#include "Renderer.hpp"
 
 extern ECS ecs;
-
-extern const float WINDOW_WIDTH;
-extern const float WINDOW_HEIGHT;
 
 void RenderSystem::Init() {
     m_Camera = ecs.CreateEntity();
@@ -73,7 +68,7 @@ void RenderSystem::Init() {
     m_VAO.Unbind();
 }
 
-void RenderSystem::Update(float deltaTime) {
+void RenderSystem::Draw(float deltaTime) {
     glClearColor(0.0f, 0.1f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -82,7 +77,7 @@ void RenderSystem::Update(float deltaTime) {
     auto& camera = ecs.GetComponent<CameraComponent>(m_Camera);
 
     glm::mat4 view = glm::lookAt(cameraTransform.position, cameraTransform.position + cameraOrientation.forwards, cameraOrientation.up);
-    glm::mat4 projection = glm::perspective(camera.FOV, WINDOW_WIDTH/WINDOW_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(camera.FOV, Engine::GetInstance->GetWindowSize().x/Engine::GetInstance->GetWindowSize().y, 0.1f, 100.0f);
 
     for (auto const& entity : m_Entities) {
         auto const& transform = ecs.GetComponent<TransformComponent>(entity);

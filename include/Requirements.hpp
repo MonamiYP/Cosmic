@@ -15,8 +15,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "ECS/ECS.hpp"
-
 #include "VertexBuffer.hpp"
 #include "VertexBufferLayout.hpp"
 #include "VertexArray.hpp"
