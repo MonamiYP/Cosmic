@@ -41,6 +41,11 @@ class ComponentManager {
             return GetComponentArray<T>()->GetData(entity);
         }
 
+        template<typename T>
+        bool HasComponent(Entity entity) {
+            return GetComponentArray<T>()->HasData(entity);
+        }
+
         void EntityDestroyed(Entity entity) {
             for (auto const& pair : m_ComponentArrays) {
                 auto const& component = pair.second;

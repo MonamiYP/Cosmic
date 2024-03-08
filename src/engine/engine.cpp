@@ -98,6 +98,9 @@ bool Engine::Init() {
 
     glPatchParameteri(GL_PATCH_VERTICES, 4);
 
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE); 
+
     return true;
 }
 

@@ -52,6 +52,10 @@ class ComponentArray : public IComponentArray {
             return m_ComponentArray[m_EntityToIndexMap[entity]];
         }
 
+        bool HasData(Entity entity) {
+            return (m_EntityToIndexMap.find(entity) != m_EntityToIndexMap.end());
+        }
+
         void EntityDestroyed(Entity entity) override {
             if (m_EntityToIndexMap.find(entity) != m_EntityToIndexMap.end())
                 RemoveData(entity);

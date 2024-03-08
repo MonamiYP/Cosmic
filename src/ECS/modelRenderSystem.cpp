@@ -29,7 +29,11 @@ void ModelRenderSystem::Draw(Entity* camera) {
         m_shader.SetMatrix4("u_projection", projection);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, transform.position);
-        model = glm::scale(model, transform.scale); 
+        model = glm::scale(model, transform.scale);
+        if (ecs.HasComponent<OrientationComponent>(entity)) {
+            auto const& orientation = ecs.GetComponent<OrientationComponent>(entity);
+            model = model * orientation.rotMatrix;
+        }
         m_shader.SetMatrix4("u_model", model);
 
         auto& entity_model = ecs.GetComponent<ModelComponent>(entity);

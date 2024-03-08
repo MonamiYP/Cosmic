@@ -55,6 +55,11 @@ class ECS {
         }
 
         template<typename T>
+        bool HasComponent(Entity entity) {
+            return m_ComponentManager->HasComponent<T>(entity);
+        }
+
+        template<typename T>
         ComponentType GetComponentType() {
             return m_ComponentManager->GetComponentType<T>();
         }

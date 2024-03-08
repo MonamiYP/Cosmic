@@ -5,6 +5,7 @@
 #include "RequirementsECS.hpp"
 #include "Systems/ModelRenderSystem.hpp"
 #include "Systems/PrimitiveRenderSystem.hpp"
+#include "Systems/CharacterControlSystem.hpp"
 #include "GenerateVertices.hpp"
 
 class TestScene : public IScene {
@@ -21,4 +22,5 @@ class TestScene : public IScene {
         Entity m_camera;
         std::shared_ptr<PrimitiveRenderSystem> m_primitiveRenderSystem;
         std::shared_ptr<ModelRenderSystem> m_modelRenderSystem;
+        std::shared_ptr<CharacterControlSystem> m_characterControlSystem;
 };
