@@ -3,6 +3,8 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "VertexBufferLayout.hpp"
+#include "Debug.hpp"
+
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<MeshTexture>& textures) {
     m_vertices = vertices;
@@ -58,6 +60,6 @@ void Mesh::Draw(Shader& shader) {
 
     //draw mesh
     glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+    GLCall(glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0));
     glBindVertexArray(0);
 }

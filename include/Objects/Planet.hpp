@@ -1,5 +1,8 @@
 #pragma once
 #include "Requirements.hpp"
+#include "Shader.hpp"
+#include "VertexArray.hpp"
+#include "IndexBuffer.hpp"
 
 class Planet {
     public:

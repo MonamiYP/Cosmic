@@ -1,15 +1,24 @@
 #pragma once
 
-#include "IScene.hpp"
-#include "Camera.hpp"
+#include "Requirements.hpp"
+#include "Scenes/IScene.hpp"
+#include "RequirementsECS.hpp"
+#include "Systems/ModelRenderSystem.hpp"
+#include "Systems/PrimitiveRenderSystem.hpp"
+#include "GenerateVertices.hpp"
 
 class TestScene : public IScene {
     public:
-        bool Init() override;
-        void Update() override;
+        TestScene();
+        ~TestScene();
+        void Update(float deltaTime) override;
         void Render() override;
-        void Destroy() override;
-
     private:
-        Camera* m_camera = nullptr;
+        void RegisterComponents();
+        void RegisterSystems();
+        void CreateEntities();
+
+        Entity m_camera;
+        std::shared_ptr<PrimitiveRenderSystem> m_primitiveRenderSystem;
+        std::shared_ptr<ModelRenderSystem> m_modelRenderSystem;
 };

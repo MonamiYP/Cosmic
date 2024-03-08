@@ -2,6 +2,15 @@
 
 #include "Requirements.hpp"
 #include "RequirementsECS.hpp"
+
+#include "VertexBuffer.hpp"
+#include "VertexBufferLayout.hpp"
+#include "VertexArray.hpp"
+#include "IndexBuffer.hpp"
+#include "Shader.hpp"
+#include "Texture.hpp"
+#include "Camera.hpp"
+
 #include "EngineConfig.hpp"
 #include "Scenes/IScene.hpp"
 
@@ -20,12 +29,12 @@ class Engine {
         static Engine* GetInstance;
         EngineConfig& config = m_config;
     private:
-        GLFWwindow* m_window;
         void ImguiInit();
         void ImguiUpdate();
         void ImguiRender();
         void ImguiDestroy();
 
+        GLFWwindow* m_window;
         EngineConfig m_config;
-        IScene* m_scene = nullptr;
+        IScene* m_scene;
 };

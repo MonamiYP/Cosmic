@@ -10,7 +10,7 @@ file(GLOB_RECURSE IMGUI lib/imgui/*.cpp)
 
 add_executable(${PROJECT_NAME} 
     src/main.cpp
-    src/glad.c
+    src/openGL/glad.c
     ${IMGUI}
     ${SOURCE_FILES}
 )
@@ -24,8 +24,12 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC res
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/entities
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/ECS
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Engine
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Objects
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/OpenGL
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Scenes
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Util
 )
 
 target_link_libraries(${PROJECT_NAME} 

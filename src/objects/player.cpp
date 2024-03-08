@@ -13,13 +13,13 @@ Player::Player(glm::vec3 position, float yaw, float pitch) {
     m_position = position;
 }
 
-void Player::SetModelFromSource(std::string const& path) {
-    m_playerModel.SetModelFromSource(path);
-}
+// void Player::SetModelFromSource(std::string const& path) {
+//     m_playerModel.SetModelFromSource(path);
+// }
 
-void Player::Render(Shader& shader) {
-    m_playerModel.Draw(shader);
-}
+// void Player::Render(Shader& shader) {
+//     m_playerModel.Draw(shader);
+// }
 
 glm::mat4 Player::GetQuaternionMatrix() {
     glm::quat q_forwards = glm::angleAxis(glm::radians(m_rotation.z), m_forwards);

@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "Scenes/TestScene.hpp"
 
 Engine* Engine::GetInstance = nullptr;
 
@@ -93,14 +94,17 @@ bool Engine::Init() {
         return false;
     }
 
-    glPatchParameteri(GL_PATCH_VERTICES, 4);
+    ImguiInit();
 
-    // Engine::GetInstance->SetActiveScene(new )
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
 
     return true;
 }
 
 void Engine::Run() {
+    TestScene scene;
+    Engine::GetInstance->SetActiveScene(&scene);
+
     while(!glfwWindowShouldClose(m_window)) {
         float currentTime = glfwGetTime();
         m_config.deltaTime = currentTime - m_config.lastTime;
@@ -108,7 +112,11 @@ void Engine::Run() {
 
         processInput(m_window);
         
-        // renderSystem->Draw(m_config.deltaTime);
+        m_scene->Update(m_config.deltaTime);
+        ImguiUpdate();
+
+        m_scene->Render();
+        ImguiRender();
 
         glfwSwapBuffers(m_window);
         glfwPollEvents();
@@ -117,15 +125,10 @@ void Engine::Run() {
 
 void Engine::SetActiveScene(IScene* scene) {
     m_scene = scene;
-
-    if(!m_scene->Init()) {
-        m_scene->Destroy();
-        delete m_scene;
-        m_scene = nullptr;
-    }
 }
 
 void Engine::Destroy() {
+    ImguiDestroy();
     glfwTerminate();
 }
 
@@ -133,4 +136,35 @@ glm::vec2 Engine::GetWindowSize() {
     int width, height;
     glfwGetWindowSize(m_window, &width, &height);
     return glm::vec2(width, height);
+}
+
+void Engine::ImguiInit() {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+}
+
+void Engine::ImguiUpdate() {
+    ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("A window");
+        // ImGui::Text("Application average %.2f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        // ImGui::Text("Player position: x:%.2f y:%.2f z:%.2f", player.GetPosition().x, player.GetPosition().y, player.GetPosition().z);
+        ImGui::End();
+}
+
+void Engine::ImguiRender() {
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Engine::ImguiDestroy() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
