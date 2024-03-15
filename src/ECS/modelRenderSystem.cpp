@@ -14,21 +14,19 @@ void ModelRenderSystem::Init() {
     m_shader.SetFloat("quadratic", 0.0007f);
 }
 
-void ModelRenderSystem::Draw(Entity* camera) {
-    auto& cameraTransform = ecs.GetComponent<TransformComponent>(*camera);
-    auto& cameraOrientation = ecs.GetComponent<OrientationComponent>(*camera);
-    auto& camera_C = ecs.GetComponent<CameraComponent>(*camera);
+void ModelRenderSystem::Draw(Entity* camr) {
+    auto& camera = ecs.GetComponent<CameraComponent>(*camr);
 
-    glm::mat4 view = glm::lookAt(cameraTransform.position, cameraTransform.position + cameraOrientation.forwards, cameraOrientation.up);
-    glm::mat4 projection = glm::perspective(camera_C.FOV, Engine::GetInstance->GetWindowSize().x/Engine::GetInstance->GetWindowSize().y, 0.1f, 100.0f);
+    glm::mat4 view = camera.view;
+    glm::mat4 projection = camera.projection;
+
+    m_shader.Bind();
+    m_shader.SetMatrix4("u_view", view);
+    m_shader.SetMatrix4("u_projection", projection);
 
     for (auto const& entity : m_Entities) {
         auto const& transform = ecs.GetComponent<TransformComponent>(entity);
-        m_shader.Bind();
-        m_shader.SetMatrix4("u_view", view);
-        m_shader.SetMatrix4("u_projection", projection);
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, transform.position);
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), transform.position);
         model = glm::scale(model, transform.scale);
         if (ecs.HasComponent<OrientationComponent>(entity)) {
             auto const& orientation = ecs.GetComponent<OrientationComponent>(entity);

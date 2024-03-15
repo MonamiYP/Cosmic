@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(Space_Explorer)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 # set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)

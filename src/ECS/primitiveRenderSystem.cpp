@@ -22,26 +22,26 @@ void PrimitiveRenderSystem::SetVAO() {
     }
 }
 
-void PrimitiveRenderSystem::Draw(Entity* camera) {
-    auto& cameraTransform = ecs.GetComponent<TransformComponent>(*camera);
-    auto& cameraOrientation = ecs.GetComponent<OrientationComponent>(*camera);
-    auto& camera_C = ecs.GetComponent<CameraComponent>(*camera);
+void PrimitiveRenderSystem::Draw(Entity* camr) {
+    auto& camera = ecs.GetComponent<CameraComponent>(*camr);
 
-    glm::mat4 view = glm::lookAt(cameraTransform.position, cameraTransform.position + cameraOrientation.forwards, cameraOrientation.up);
-    glm::mat4 projection = glm::perspective(camera_C.FOV, Engine::GetInstance->GetWindowSize().x/Engine::GetInstance->GetWindowSize().y, 0.1f, 100.0f);
+    glm::mat4 view = camera.view;
+    glm::mat4 projection = camera.projection;
+
+    m_shader.Bind();
+    m_shader.SetMatrix4("u_view", view);
+    m_shader.SetMatrix4("u_projection", projection);
 
     for (auto const& entity : m_Entities) {
         auto const& transform = ecs.GetComponent<TransformComponent>(entity);
-        m_shader.Bind();
-        m_shader.SetMatrix4("u_view", view);
-        m_shader.SetMatrix4("u_projection", projection);
+        auto const& vertices = ecs.GetComponent<VertexComponent>(entity);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, transform.position);
         model = glm::scale(model, transform.scale); 
         m_shader.SetMatrix4("u_model", model);
 
         m_VAO.Bind();
-        GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+        GLCall(glDrawArrays(GL_TRIANGLES, 0, vertices.indicesCount));
     }
 
     m_VAO.Unbind();

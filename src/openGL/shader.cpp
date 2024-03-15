@@ -1,7 +1,8 @@
 #include "Shader.hpp"
+#include "Debug.hpp"
 
 void Shader::Bind() const {
-    glUseProgram(m_shaderProgramID);
+    GLCall(glUseProgram(m_shaderProgramID));
 }
 
 void Shader::Unbind() const {

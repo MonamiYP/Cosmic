@@ -2,4 +2,5 @@
 
 struct VertexComponent {
     std::vector<float> vertices;
+    float indicesCount;
 };

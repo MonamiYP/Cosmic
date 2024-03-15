@@ -9,7 +9,6 @@
 #include "IndexBuffer.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
-#include "Camera.hpp"
 
 #include "EngineConfig.hpp"
 #include "Scenes/IScene.hpp"
@@ -28,6 +27,7 @@ class Engine {
     
         static Engine* GetInstance;
         EngineConfig& config = m_config;
+        IScene* m_scene;
     private:
         void ImguiInit();
         void ImguiUpdate();
@@ -36,5 +36,4 @@ class Engine {
 
         GLFWwindow* m_window;
         EngineConfig m_config;
-        IScene* m_scene;
 };

@@ -1,26 +1,27 @@
 #include "Engine.hpp"
 #include "Scenes/TestScene.hpp"
+#include "Directions.hpp"
 
 Engine* Engine::GetInstance = nullptr;
 
-void processInput(GLFWwindow *window) {
+void processInput(GLFWwindow* window, IScene* scene) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    // if(!guiActive) {
-    //     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    //         player.ProcessKeyboardInput(FORWARDS, deltaTime);
-    //     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    //         player.ProcessKeyboardInput(BACKWARDS, deltaTime);
-    //     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    //         player.ProcessKeyboardInput(LEFT, deltaTime);
-    //     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    //         player.ProcessKeyboardInput(RIGHT, deltaTime);
-    //     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    //         player.ProcessKeyboardInput(UP, deltaTime);
-    //     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    //         player.ProcessKeyboardInput(DOWN, deltaTime);
-    // }
+    if(!Engine::GetInstance->config.guiActive) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            scene->ProcessKeyboardInput(MovementDir::FORWARDS, Engine::GetInstance->config.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            scene->ProcessKeyboardInput(MovementDir::BACKWARDS, Engine::GetInstance->config.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            scene->ProcessKeyboardInput(MovementDir::LEFT, Engine::GetInstance->config.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            scene->ProcessKeyboardInput(MovementDir::RIGHT, Engine::GetInstance->config.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            scene->ProcessKeyboardInput(MovementDir::UP, Engine::GetInstance->config.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            scene->ProcessKeyboardInput(MovementDir::DOWN, Engine::GetInstance->config.deltaTime);
+    }
 }
 
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
@@ -29,7 +30,7 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
     Engine::GetInstance->Engine::GetInstance->config.lastX = xPos;
     Engine::GetInstance->Engine::GetInstance->config.lastY = yPos;
 
-    // player.ProcessMouseInput(xOffset, yOffset);
+    Engine::GetInstance->m_scene->ProcessMouseInput(xOffset, yOffset);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -84,7 +85,7 @@ bool Engine::Init() {
 
     glfwMakeContextCurrent(m_window);
     glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(m_window, 0);
+    glfwSetCursorPosCallback(m_window, mouse_callback);
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
     glfwSetKeyCallback(m_window, key_callback);
     glfwSetWindowFocusCallback(m_window, window_focus_callback);
@@ -113,7 +114,7 @@ void Engine::Run() {
         m_config.deltaTime = currentTime - m_config.lastTime;
         m_config.lastTime = currentTime;
 
-        processInput(m_window);
+        processInput(m_window, m_scene);
         
         m_scene->Update(m_config.deltaTime);
         ImguiUpdate();

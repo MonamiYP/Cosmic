@@ -2,7 +2,7 @@
 
 layout (vertices = 4) out;
 
-uniform vec3 u_playerPos;
+uniform vec3 u_cameraPos;
 uniform float u_radius;
 
 float distance[];
@@ -26,13 +26,13 @@ void main() {
         worldPos10 = u_model * vec4(u_radius/length(worldPos10) * worldPos10.xyz, worldPos10.w);
         worldPos01 = u_model * vec4(u_radius/length(worldPos01) * worldPos01.xyz, worldPos01.w);
         worldPos11 = u_model * vec4(u_radius/length(worldPos11) * worldPos11.xyz, worldPos11.w);
-        vec4 playerPos = vec4(u_playerPos, 1.0);
+        vec4 cameraPos = vec4(u_cameraPos, 1.0);
 
         // Find the distance of each vertex from player (between 0 and 1)
-        float distance00 = clamp((length(playerPos-worldPos00)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
-        float distance10 = clamp((length(playerPos-worldPos10)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
-        float distance01 = clamp((length(playerPos-worldPos01)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
-        float distance11 = clamp((length(playerPos-worldPos11)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
+        float distance00 = clamp((length(cameraPos-worldPos00)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
+        float distance10 = clamp((length(cameraPos-worldPos10)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
+        float distance01 = clamp((length(cameraPos-worldPos01)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
+        float distance11 = clamp((length(cameraPos-worldPos11)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
 
         // Determine how much tesselation we need depending on distance from player
         float tessLevel0 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance01, distance00));
