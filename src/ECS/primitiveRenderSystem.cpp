@@ -9,9 +9,7 @@ void PrimitiveRenderSystem::Init() {
     m_shader.CreateShaderProgram(vertex_source, fragment_source);
     m_shader.Bind();
     m_shader.SetVector3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
-}
 
-void PrimitiveRenderSystem::SetVAO() {
     for (auto const& entity: m_Entities) {
         std::vector<float> cubeVertices = ecs.GetComponent<VertexComponent>(entity).vertices;
         VertexBuffer VBO(&cubeVertices[0], cubeVertices.size() * sizeof(GLfloat));

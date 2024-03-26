@@ -11,9 +11,7 @@ void PlanetRenderSystem::Init() {
     m_shader.CreateShaderProgram(vertex_source, tesc_source, tese_source, fragment_source);
     m_shader.Bind();
     m_shader.SetFloat("u_radius", 1000.0f);
-}
 
-void PlanetRenderSystem::SetVAO() {
     for (auto const& entity: m_Entities) {
         std::vector<float> planetVertices = ecs.GetComponent<VertexComponent>(entity).vertices;
         VertexBuffer VBO(&planetVertices[0], planetVertices.size() * sizeof(GLfloat));

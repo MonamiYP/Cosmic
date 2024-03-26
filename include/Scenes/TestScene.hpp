@@ -30,4 +30,5 @@ class TestScene : public IScene {
         std::shared_ptr<PlanetRenderSystem> m_planetRenderSystem;
         std::shared_ptr<ModelRenderSystem> m_modelRenderSystem;
         std::shared_ptr<MovementSystem> m_movementSystem;
+        std::shared_ptr<LightSystem> m_lightSystem;
 };
