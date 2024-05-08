@@ -53,6 +53,7 @@ void TestScene::Render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDepthFunc(GL_LEQUAL);
+
     m_skyBoxShader.Bind();
     auto& camera = ecs.GetComponent<CameraComponent>(m_camera);
     m_skyBoxShader.SetMatrix4("u_view", glm::mat4(glm::mat3(camera.view)));

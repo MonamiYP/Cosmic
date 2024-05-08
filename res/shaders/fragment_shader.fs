@@ -66,6 +66,7 @@ void main() {
     vec3 result = vec3(0.0);
     for (int i = 0; i < no_pointLights; i++)
         result += CalculatePointLight(pointLights[i], norm, FragPos, viewDir);
-
-    FragColor = vec4(result, 1.0);
+    
+    float gamma = 2.2;
+    FragColor = vec4(pow(result, vec3(1.0/gamma)), 1.0);
 }

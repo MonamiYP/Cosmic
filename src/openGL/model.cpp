@@ -137,10 +137,11 @@ unsigned int Model::TextureFromFile(const char* path, const std::string& directo
     unsigned char* textureData = stbi_load(filename.c_str(), &width, &height, &BPP, 0);
     if (textureData) {
             GLenum format;
-            if (BPP == 1) {format = GL_RED;}
-            else if (BPP == 3) {format = GL_RGB;}
-            else {format = GL_RGBA;}
-            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, textureData);
+            GLenum gamma_format;
+            if (BPP == 1) {format = GL_RED; gamma_format = GL_RED; }
+            else if (BPP == 3) {format = GL_RGB; gamma_format = GL_SRGB; }
+            else {format = GL_RGBA; gamma_format = GL_SRGB_ALPHA; }
+            glTexImage2D(GL_TEXTURE_2D, 0, gamma_format, width, height, 0, format, GL_UNSIGNED_BYTE, textureData);
             glGenerateMipmap(GL_TEXTURE_2D);
         } else {
             std::cout << "Failed to load texture" << std::endl;
