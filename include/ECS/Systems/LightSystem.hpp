@@ -8,13 +8,9 @@
 
 #include "Engine.hpp"
 
-class ModelRenderSystem : public System {
+class LightSystem : public System {
     public:
         void Init();
-        void Draw(Entity* camera);
-
-        Shader* GetShader() { return &m_shader; }
+        void SetupShaderLights(Shader* shader);
     private:
-        Shader m_shader;
-        VertexArray m_VAO;
 };

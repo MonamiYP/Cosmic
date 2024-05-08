@@ -6,8 +6,10 @@ TestScene::TestScene() {
     RegisterComponents();
     RegisterSystems();
     CreateEntities();
-    m_primitiveRenderSystem->SetVAO();
-    m_planetRenderSystem->SetVAO();
+    m_planetRenderSystem->Init();
+    m_primitiveRenderSystem->Init();
+    m_modelRenderSystem->Init();
+    m_lightSystem->SetupShaderLights(m_modelRenderSystem->GetShader());
 
     std::vector<std::string> faces { 
         "../res/assets/space_skybox/right.png", 
@@ -51,6 +53,7 @@ void TestScene::Render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDepthFunc(GL_LEQUAL);
+
     m_skyBoxShader.Bind();
     auto& camera = ecs.GetComponent<CameraComponent>(m_camera);
     m_skyBoxShader.SetMatrix4("u_view", glm::mat4(glm::mat3(camera.view)));
@@ -75,6 +78,7 @@ void TestScene::RegisterComponents() {
     ecs.RegisterComponent<VertexComponent>();
     ecs.RegisterComponent<InputComponent>();
     ecs.RegisterComponent<LightComponent>();
+    ecs.RegisterComponent<MaterialComponent>();
     ecs.RegisterComponent<PlanetComponent>();
 }
 
@@ -86,7 +90,6 @@ void TestScene::RegisterSystems() {
         signature.set(ecs.GetComponentType<VertexComponent>());
         ecs.SetSystemSignature<PrimitiveRenderSystem>(signature);
     }
-    m_primitiveRenderSystem->Init();
 
     m_planetRenderSystem = ecs.RegisterSystem<PlanetRenderSystem>();
     {
@@ -95,7 +98,6 @@ void TestScene::RegisterSystems() {
         signature.set(ecs.GetComponentType<VertexComponent>());
         ecs.SetSystemSignature<PlanetRenderSystem>(signature);
     }
-    m_planetRenderSystem->Init();
 
     m_modelRenderSystem = ecs.RegisterSystem<ModelRenderSystem>();
     {
@@ -104,7 +106,6 @@ void TestScene::RegisterSystems() {
         signature.set(ecs.GetComponentType<ModelComponent>());
         ecs.SetSystemSignature<ModelRenderSystem>(signature);
     }
-    m_modelRenderSystem->Init();
 
     m_movementSystem = ecs.RegisterSystem<MovementSystem>();
     {
@@ -113,7 +114,12 @@ void TestScene::RegisterSystems() {
         signature.set(ecs.GetComponentType<InputComponent>());
         ecs.SetSystemSignature<MovementSystem>(signature);
     }
-    m_movementSystem->Init();
+
+    m_lightSystem = ecs.RegisterSystem<LightSystem>();
+    {
+        Signature signature;
+        signature.set(ecs.GetComponentType<LightComponent>());
+    }
 }
 
 void TestScene::CreateEntities() {
@@ -129,22 +135,41 @@ void TestScene::CreateEntities() {
     ecs.AddComponent(player, ModelComponent { .model = model });
     ecs.AddComponent(player, InputComponent { .yes = true });
     ecs.AddComponent(player, OrientationComponent {});
+    ecs.AddComponent(player, MaterialComponent { .shininess = 32.0f });
 
-    std::vector<float> cubeVertices = GenerateVertices::GetCubeVertices();
-    Entity light = ecs.CreateEntity();
-    ecs.AddComponent(light, TransformComponent { .scale = glm::vec3(0.1f) });
-    ecs.AddComponent(light, VertexComponent { .vertices =  cubeVertices, .indicesCount = 36 });
-    ecs.AddComponent(light, LightComponent { .lightColor = glm::vec3(1.0f, 1.0f, 1.0f) });
-    
-    Entity light2 = ecs.CreateEntity();
-    ecs.AddComponent(light2, TransformComponent { .position = glm::vec3(5.0f, 0.0f, -10.0f), .scale = glm::vec3(0.1f)});
-    ecs.AddComponent(light2, VertexComponent { .vertices = cubeVertices, .indicesCount = 36 });
-    ecs.AddComponent(light2, LightComponent { .lightColor = glm::vec3(1.0f, 1.0f, 1.0f) });
+    { // Lights
+        std::vector<float> cubeVertices = GenerateVertices::GetCubeVertices();
+        Entity light = ecs.CreateEntity();
+        ecs.AddComponent(light, TransformComponent { .scale = glm::vec3(0.1f) });
+        ecs.AddComponent(light, VertexComponent { .vertices =  cubeVertices, .indicesCount = 36 });
+        ecs.AddComponent(light, LightComponent { .ambient = glm::vec3(0.99f, 0.0f, 0.0f), .diffuse = glm::vec3(0.99f, 0.0f, 0.0f), .specular = glm::vec3(0.99f, 0.0f, 0.0f) });
+        
+        Entity light2 = ecs.CreateEntity();
+        ecs.AddComponent(light2, TransformComponent { .position = glm::vec3(10.0f, 0.0f, 0.0f), .scale = glm::vec3(0.1f)});
+        ecs.AddComponent(light2, VertexComponent { .vertices = cubeVertices, .indicesCount = 36 });
+        ecs.AddComponent(light2, LightComponent { .ambient = glm::vec3(0.0f, 0.0f, 0.99f), .diffuse = glm::vec3(0.0f, 0.0f, 0.99f), .specular = glm::vec3(0.0f, 0.99f, 0.0f) });
+
+        Entity light3 = ecs.CreateEntity();
+        ecs.AddComponent(light3, TransformComponent { .position = glm::vec3(5.0f, 5.0f, 0.0f), .scale = glm::vec3(0.1f)});
+        ecs.AddComponent(light3, VertexComponent { .vertices = cubeVertices, .indicesCount = 36 });
+        ecs.AddComponent(light3, LightComponent { .ambient = glm::vec3(0.0f, 0.99f, 0.0f), .diffuse = glm::vec3(0.0f, 0.99f, 0.0f), .specular = glm::vec3(0.0f, 0.0f, 0.99f) });
+
+        Entity lightFollowPlayer = ecs.CreateEntity();
+        ecs.AddComponent(lightFollowPlayer, TransformComponent { .position = glm::vec3(0.0f, 0.0f, 0.0f) });
+        ecs.AddComponent(lightFollowPlayer, LightComponent { .ambient = glm::vec3(0.1f, 0.1f, 0.1f),  .diffuse = glm::vec3(0.1f, 0.1f, 0.1f) });
+    }
 
     Entity planet = ecs.CreateEntity();
     float resolution = 10;
-    float radius = 1000.0f;
+    float radius = 100.0f;
     ecs.AddComponent(planet, TransformComponent { .position = glm::vec3(radius, radius, radius) });
     ecs.AddComponent(planet, VertexComponent { .vertices = GenerateVertices::GetSphereVertices(radius, resolution), .indicesCount = 4*resolution*resolution*6 });
     ecs.AddComponent(planet, PlanetComponent { .radius = radius });
+
+    Entity planet2 = ecs.CreateEntity();
+    resolution = 8;
+    radius = 1000.0f;
+    ecs.AddComponent(planet2, TransformComponent { .position = glm::vec3(-radius/1.5, -radius/1.5, -radius/1.5) });
+    ecs.AddComponent(planet2, VertexComponent { .vertices = GenerateVertices::GetSphereVertices(radius, resolution), .indicesCount = 4*resolution*resolution*6 });
+    ecs.AddComponent(planet2, PlanetComponent { .radius = radius });
 }

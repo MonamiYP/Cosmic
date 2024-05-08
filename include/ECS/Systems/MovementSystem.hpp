@@ -19,7 +19,7 @@ class MovementSystem : public System {
         glm::mat4 GetQuaternionMatrix(const Entity* entity);
         void SetRotationMatrix(const Entity* entity);
 
-        float m_movementSpeed = 100.0f;
+        float m_movementSpeed = 10.0f;
         float m_rollSpeed = 100.0f;
         float m_mouseSensitivity = 0.02f;
         glm::mat4 m_prev_rot = glm::mat4(1.0f);
