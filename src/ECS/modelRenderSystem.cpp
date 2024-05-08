@@ -10,6 +10,7 @@ void ModelRenderSystem::Init() {
 
 void ModelRenderSystem::Draw(Entity* camr) {
     auto& camera = ecs.GetComponent<CameraComponent>(*camr);
+    auto& cameraTransform = ecs.GetComponent<TransformComponent>(*camr);
 
     glm::mat4 view = camera.view;
     glm::mat4 projection = camera.projection;
@@ -17,6 +18,8 @@ void ModelRenderSystem::Draw(Entity* camr) {
     m_shader.Bind();
     m_shader.SetMatrix4("u_view", view);
     m_shader.SetMatrix4("u_projection", projection);
+
+    m_shader.SetVector3("u_viewPos", cameraTransform.position);
 
     for (auto const& entity : m_Entities) {
         auto const& transform = ecs.GetComponent<TransformComponent>(entity);
@@ -29,8 +32,6 @@ void ModelRenderSystem::Draw(Entity* camr) {
         m_shader.SetMatrix4("u_model", model);
 
         auto const& material = ecs.GetComponent<MaterialComponent>(entity);
-        m_shader.SetVector3("material.diffuse", material.diffuse);
-        m_shader.SetVector3("material.specular", material.specular);
         m_shader.SetFloat("material.shininess", material.shininess);
 
         auto& entity_model = ecs.GetComponent<ModelComponent>(entity);

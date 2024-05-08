@@ -10,7 +10,6 @@ void PlanetRenderSystem::Init() {
     std::string fragment_source = m_shader.ParseShader("../res/shaders/planet.fs");
     m_shader.CreateShaderProgram(vertex_source, tesc_source, tese_source, fragment_source);
     m_shader.Bind();
-    m_shader.SetFloat("u_radius", 1000.0f);
 
     for (auto const& entity: m_Entities) {
         std::vector<float> planetVertices = ecs.GetComponent<VertexComponent>(entity).vertices;
@@ -39,11 +38,15 @@ void PlanetRenderSystem::Draw(Entity* camr) {
     for (auto const& entity : m_Entities) {
         auto const& transform = ecs.GetComponent<TransformComponent>(entity);
         auto const& vertices = ecs.GetComponent<VertexComponent>(entity);
+        auto const& planet = ecs.GetComponent<PlanetComponent>(entity);
+
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, transform.position);
         model = glm::scale(model, transform.scale); 
         m_shader.SetMatrix4("u_model", model);
         m_shader.SetVector3("u_cameraPos", cameraTransform.position);
+
+        m_shader.SetFloat("u_radius", planet.radius);
 
         GLCall(glDrawArrays(GL_PATCHES, 0, vertices.indicesCount));
     }

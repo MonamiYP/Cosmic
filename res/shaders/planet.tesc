@@ -13,7 +13,7 @@ void main() {
     if (gl_InvocationID == 0) {
         const int MIN_TESS_LEVEL = 2;
         const int MAX_TESS_LEVEL = 32;
-        float MIN_DISTANCE = 100;
+        float MIN_DISTANCE = 10;
         float MAX_DISTANCE = u_radius/2;
 
         // Get position of vertices and player in world space
