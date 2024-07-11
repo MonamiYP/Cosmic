@@ -24,7 +24,7 @@ void MovementSystem::Update(float deltaTime, Entity* camr) {
         cameraTransform.position = transform.position - cameraOrientation.forwards * camera.distanceFromTarget;
 
         camera.view = glm::lookAt(cameraTransform.position, cameraTransform.position + cameraOrientation.forwards, cameraOrientation.up);
-        camera.projection = glm::perspective(camera.FOV, Engine::GetInstance->GetWindowSize().x/Engine::GetInstance->GetWindowSize().y, 1.0f, 10000.0f);
+        camera.projection = glm::perspective(camera.FOV, Engine::GetInstance->GetWindowSize().x/Engine::GetInstance->GetWindowSize().y, 1.0f, 500.0f);
     }
 }
 

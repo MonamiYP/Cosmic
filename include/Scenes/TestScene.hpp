@@ -13,8 +13,11 @@ class TestScene : public IScene {
         ~TestScene();
         void Update(float deltaTime) override;
         void Render() override;
+
         void ProcessKeyboardInput(MovementDir dir, float deltaTime) override;
         void ProcessMouseInput(float xOffset, float yOffset) override;
+        void ProcessMouseClick(float xpos, float ypos) override;
+
     private:
         void RegisterComponents();
         void RegisterSystems();

@@ -33,6 +33,17 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
     Engine::GetInstance->m_scene->ProcessMouseInput(xOffset, yOffset);
 }
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    // ImGuiIO& io = ImGui::GetIO();
+    // if(Engine::GetInstance->config.guiActive && !io.WantCaptureMouse) {
+    //     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+    //         double xpos, ypos;
+    //         glfwGetCursorPos(window, &xpos, &ypos);
+    //         Engine::GetInstance->m_scene->ProcessMouseClick(xpos, ypos);
+    //     }
+    // }
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
         if (!Engine::GetInstance->config.guiActive) {
@@ -86,6 +97,7 @@ bool Engine::Init() {
     glfwMakeContextCurrent(m_window);
     glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
     glfwSetCursorPosCallback(m_window, mouse_callback);
+    glfwSetMouseButtonCallback(m_window, mouse_button_callback);
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
     glfwSetKeyCallback(m_window, key_callback);
     glfwSetWindowFocusCallback(m_window, window_focus_callback);
@@ -95,7 +107,7 @@ bool Engine::Init() {
         return false;
     }
 
-    ImguiInit();
+    m_imgui.Init(m_window);
 
     glPatchParameteri(GL_PATCH_VERTICES, 4);
 
@@ -117,10 +129,10 @@ void Engine::Run() {
         processInput(m_window, m_scene);
         
         m_scene->Update(m_config.deltaTime);
-        ImguiUpdate();
+        m_imgui.Update();
 
         m_scene->Render();
-        ImguiRender();
+        m_imgui.Render();
 
         glfwSwapBuffers(m_window);
         glfwPollEvents();
@@ -132,7 +144,7 @@ void Engine::SetActiveScene(IScene* scene) {
 }
 
 void Engine::Destroy() {
-    ImguiDestroy();
+    m_imgui.Destroy();
     glfwTerminate();
 }
 
@@ -140,35 +152,4 @@ glm::vec2 Engine::GetWindowSize() {
     int width, height;
     glfwGetWindowSize(m_window, &width, &height);
     return glm::vec2(width, height);
-}
-
-void Engine::ImguiInit() {
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(m_window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
-}
-
-void Engine::ImguiUpdate() {
-    ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::Begin("A window");
-        // ImGui::Text("Application average %.2f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        // ImGui::Text("Player position: x:%.2f y:%.2f z:%.2f", player.GetPosition().x, player.GetPosition().y, player.GetPosition().z);
-        ImGui::End();
-}
-
-void Engine::ImguiRender() {
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-void Engine::ImguiDestroy() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 }

@@ -44,6 +44,11 @@ void TestScene::ProcessMouseInput(float xOffset, float yOffset) {
     m_movementSystem->ProcessMouseInput(xOffset, yOffset);
 }
 
+void TestScene::ProcessMouseClick(float xpos, float ypos) {
+    // TODO
+    std::cout << xpos << std::endl;
+}
+
 void TestScene::Update(float deltaTime) {
     m_movementSystem->Update(deltaTime, &m_camera);
 }
@@ -164,12 +169,12 @@ void TestScene::CreateEntities() {
     float radius = 100.0f;
     ecs.AddComponent(planet, TransformComponent { .position = glm::vec3(radius, radius, radius) });
     ecs.AddComponent(planet, VertexComponent { .vertices = GenerateVertices::GetSphereVertices(radius, resolution), .indicesCount = 4*resolution*resolution*6 });
-    ecs.AddComponent(planet, PlanetComponent { .radius = radius });
+    ecs.AddComponent(planet, PlanetComponent { .radius = radius, .color = glm::vec3(0.7f, 0.6f, 0.2f) });
 
-    Entity planet2 = ecs.CreateEntity();
-    resolution = 8;
-    radius = 1000.0f;
-    ecs.AddComponent(planet2, TransformComponent { .position = glm::vec3(-radius/1.5, -radius/1.5, -radius/1.5) });
-    ecs.AddComponent(planet2, VertexComponent { .vertices = GenerateVertices::GetSphereVertices(radius, resolution), .indicesCount = 4*resolution*resolution*6 });
-    ecs.AddComponent(planet2, PlanetComponent { .radius = radius });
+    // Entity planet2 = ecs.CreateEntity();
+    // resolution = 8;
+    // radius = 1000.0f;
+    // ecs.AddComponent(planet2, TransformComponent { .position = glm::vec3(-radius/1.5, -radius/1.5, -radius/1.5) });
+    // ecs.AddComponent(planet2, VertexComponent { .vertices = GenerateVertices::GetSphereVertices(radius, resolution), .indicesCount = 4*resolution*resolution*6 });
+    // ecs.AddComponent(planet2, PlanetComponent { .radius = radius });
 }

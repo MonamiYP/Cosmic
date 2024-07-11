@@ -34,7 +34,7 @@ void PlanetRenderSystem::Draw(Entity* camr) {
 
     glDepthMask(GL_TRUE);
     m_VAO.Bind();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     for (auto const& entity : m_Entities) {
         auto const& transform = ecs.GetComponent<TransformComponent>(entity);
         auto const& vertices = ecs.GetComponent<VertexComponent>(entity);
@@ -47,10 +47,11 @@ void PlanetRenderSystem::Draw(Entity* camr) {
         m_shader.SetVector3("u_cameraPos", cameraTransform.position);
 
         m_shader.SetFloat("u_radius", planet.radius);
+        m_shader.SetVector3("u_color", planet.color);
 
         GLCall(glDrawArrays(GL_PATCHES, 0, vertices.indicesCount));
     }
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     m_VAO.Unbind();
 }

@@ -14,7 +14,6 @@ class PlanetRenderSystem : public System {
     public:
         void Init();
         void Draw(Entity* camera);
-        void SetVAO();
 
     private:
         Shader m_shader;

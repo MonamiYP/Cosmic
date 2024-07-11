@@ -12,6 +12,7 @@
 
 #include "EngineConfig.hpp"
 #include "Scenes/IScene.hpp"
+#include "Imgui.hpp"
 
 class Engine {
     public:
@@ -28,12 +29,9 @@ class Engine {
         static Engine* GetInstance;
         EngineConfig& config = m_config;
         IScene* m_scene;
+        
     private:
-        void ImguiInit();
-        void ImguiUpdate();
-        void ImguiRender();
-        void ImguiDestroy();
-
         GLFWwindow* m_window;
         EngineConfig m_config;
+        Imgui m_imgui;
 };
